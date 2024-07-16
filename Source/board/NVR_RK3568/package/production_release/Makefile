@@ -123,6 +123,7 @@ platform_upgrade_zip:
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/bin
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/etc
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/lib/udev/rules.d
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/usr
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/sbin
@@ -130,11 +131,12 @@ platform_upgrade_zip:
 	# copying files
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/kernel $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/kernel
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/ko $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/ko
+	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/lib/udev/rules.d/81-local.rules $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/lib/udev/rules.d/81-local.rules
 
 	# deleting empty directories
 	find $(LOCAL_PLATFORM_UPGRADE_DIR_PATH) -type d -empty -delete
 	
-	cd $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/ && zip -r -y -q -9 $(PLATFORM_UPGRADE_FILE) bin etc matrix usr sbin
+	cd $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/ && zip -r -y -q -9 $(PLATFORM_UPGRADE_FILE) *
 	mv $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE) $(PLATFROM_BUILD_OUTPUT_PATH)
 	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
 	

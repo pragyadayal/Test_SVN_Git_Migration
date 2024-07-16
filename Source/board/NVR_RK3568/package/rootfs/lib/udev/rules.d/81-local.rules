@@ -19,7 +19,12 @@ SUBSYSTEM=="block", KERNEL=="sd[a-z]", RUN+="/matrix/bin/devDetect.bin $env{SUBS
 # The first rtc device is symlinked to /dev/rtc
 KERNEL=="rtc0", SYMLINK+="rtc"
 
-SUBSYSTEM=="net", SUBSYSTEMS=="usb" GOTO+="end"
+#Handle network Interface Dongle
+KERNEL=="eth*", SUBSYSTEM=="net", ACTION=="add" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
+KERNEL=="eth*", SUBSYSTEM=="net", ACTION=="remove" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
+
+KERNEL=="usb*", SUBSYSTEM=="net", ACTION=="add" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
+KERNEL=="usb*", SUBSYSTEM=="net", ACTION=="remove" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
 
 # The sequence of attributes in the application is as below,
 # 1.subsystem 2.action 3.path 4.vendorid 5.productid 6.interfaceclass
@@ -38,7 +43,4 @@ KERNEL=="ttyUSB*", SUBSYSTEM=="tty", ACTION=="remove" RUN+="/matrix/bin/devDetec
 
 KERNEL=="ttyACM*", SUBSYSTEM=="tty", ACTION=="add" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
 KERNEL=="ttyACM*", SUBSYSTEM=="tty", ACTION=="remove" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
-
-
-LABEL=="end"
 
