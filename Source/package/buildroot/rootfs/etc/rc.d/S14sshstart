@@ -1,0 +1,68 @@
+#!/bin/sh
+#
+#################################################################################################
+# PURPOSE	: This script start the SSH service for login purpose
+###################################################################################################
+
+# include platform_common script for debug..
+. $2
+
+SERVICE_NAME=`basename $0`
+
+
+if [ "$SSH_SERVICE_ENABLE"  == "NO" ]
+then
+	platform_debug "Info: SSH service is disable"
+	exit
+fi
+
+
+# Creating "lastlog" file in /var/log, for last login information during SSH login time.
+touch /var/log/lastlog
+
+#get ethernet address from cmdline
+ETHADDR=`cat /proc/cmdline | awk -F "ethaddr=" '{print $2}' | awk '{print $1}'`
+
+platform_debug "Info: changing se and root passwords"
+chmod +x /usr/sbin/passwordupdate 
+
+#passed the ethaddr as the command line argument
+/usr/sbin/passwordupdate root $ETHADDR
+/usr/sbin/passwordupdate se $ETHADDR
+
+# SSH starting
+if [ -e $SSH_KEY_GEYGEN_PATH ]
+then 
+	mkdir -p /var/empty
+	chown root:sshd /var/empty
+	chmod 755 /var/empty
+	chmod 755 $SSH_KEY_GEYGEN_PATH
+	chmod 755 /usr/bin/scp
+	chmod 755 /usr/sbin/sshd
+	touch /var/log/btmp
+	chmod 600 /var/log/btmp
+
+	if [ ! -e /etc/ssh/ssh_host_dsa_key ]
+	then
+		$SSH_KEY_GEYGEN_PATH -t dsa -f /etc/ssh/ssh_host_dsa_key -N ""
+	fi
+
+	if [ ! -e /etc/ssh/ssh_host_rsa_key ]
+	then
+		$SSH_KEY_GEYGEN_PATH -t rsa -f /etc/ssh/ssh_host_rsa_key -N ""
+	fi
+
+	chmod 600 /etc/ssh/ssh_host_dsa_key
+	chmod 600 /etc/ssh/ssh_host_rsa_key
+
+	chmod 644 /etc/ssh/ssh_host_dsa_key.pub
+	chmod 644 /etc/ssh/ssh_host_rsa_key.pub
+else
+	platform_debug "Error: /bin/ssh-keygen file not exit"
+fi
+
+# Starting SSH
+chmod +x /etc/ssh/startstop.sh
+/etc/ssh/startstop.sh 1 $2
+
+#End of Script

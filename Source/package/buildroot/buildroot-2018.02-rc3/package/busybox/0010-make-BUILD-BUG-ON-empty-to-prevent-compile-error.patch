@@ -1,0 +1,12 @@
+diff -rNu a/include/libbb.h b/include/libbb.h
+--- a/include/libbb.h	2017-07-18 22:50:58.000000000 +0530
++++ b/include/libbb.h	2023-10-12 19:18:25.921333443 +0530
+@@ -2039,7 +2039,7 @@
+ 
+ 
+ #define ARRAY_SIZE(x) ((unsigned)(sizeof(x) / sizeof((x)[0])))
+-#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
++#define BUILD_BUG_ON(condition) 
+ 
+ 
+ /* We redefine ctype macros. Unicode-correct handling of char types

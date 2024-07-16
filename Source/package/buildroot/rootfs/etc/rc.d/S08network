@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+#################################################################################################
+# PURPOSE	: This script will do,
+#		: 1 - Inserting Network drivers.
+#		: 2 - Assign default IP address for both WAN, LAN and SGMII (Octasic).
+#		: 3 - Assign loopback IP address
+###################################################################################################
+
+# include platform_common script for debug..
+. $2
+
+SERVICE_NAME=`basename $0`
+
+DEF_ETHADDR=00:11:22:33:00:1
+
+if [ ! -x /sbin/ifconfig ]
+then
+	platform_debug "Error: /sbin/ifconfig missing, unable to configure the network"
+	exit 0
+fi
+
+if [ "$1" = "start" ]
+then
+
+	FINDETHADDR=ethaddr
+	for i in $ETHINTERF_NUM
+	do
+		if [ "$i" != 0 ]
+		then
+			FINDETHADDR=ethaddr$i
+		fi
+
+		ETHADDR=`cat /proc/cmdline | awk -F "$FINDETHADDR=" '{print $2}' | awk '{print $1}'`
+		if [ "$i" -eq 0 ]
+		then
+			ifconfig $ETHINTERF_NAM$i hw ether $ETHADDR
+			if [ "$?" != 0 ]
+			then
+				platform_debug "ERR:Failed to assign MAC address $ETHADDR"
+				platform_debug "INFO:Going to assign default MAC address $ETHINTERF_NAM$i hw ether $DEF_ETHADDR$i"
+				ifconfig $ETHINTERF_NAM$i hw ether $DEF_ETHADDR$i
+			fi
+		else
+			ifconfig $ETHINTERF_NAM$i hw ether $ETHADDR
+			if [ "$?" != 0 ]
+			then
+				platform_debug "ERR:Failed to assign MAC address $ETHADDR"
+				platform_debug "INFO:Going to assign default MAC address $ETHINTERF_NAM$i hw ether $DEF_ETHADDR$i"
+				ifconfig $ETHINTERF_NAM$i hw ether $DEF_ETHADDR$i
+			fi
+		fi
+		j=`expr $i + 1`
+		IPADDR=`echo $DEFAULT_IP | awk -v var="$j" '{print $var }'`
+		platform_debug "INFO:Going to assign IP address $ETHINTERF_NAM$i $IPADDR"
+		ifconfig $ETHINTERF_NAM$i $IPADDR
+	done
+
+	platform_debug "INFO: Setting up network on loopback device: "
+
+	ifconfig lo 127.0.0.1
+	route add -net 127.0.0.0 netmask 255.0.0.0 lo 
+fi
+
+#End of Script
+	

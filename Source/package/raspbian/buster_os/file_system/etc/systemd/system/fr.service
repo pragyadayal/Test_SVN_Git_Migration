@@ -1,0 +1,13 @@
+[Unit]
+Description=fr service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /etc/fr/fr.sh start
+TimeoutSec=15min
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target 

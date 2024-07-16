@@ -1,0 +1,10 @@
+Compiling OTPW in RPi4:
+
+1. Login to RPi4 as root user 
+2. Run following cmd 
+   - svn export --force svn://192.168.100.5/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/SWD/Trunk/Source/package/otpw /root/otpw
+   - mkdir /root/BUILD
+   - cd /root/otpw
+   - make BOARD_TYPE=RASPBERRY_PI_4 source extract patch build
+
+Note: otpw-gen binary and pam_otpw.so library will be generated inside /root/BUILD/otpw-1.5 dir.

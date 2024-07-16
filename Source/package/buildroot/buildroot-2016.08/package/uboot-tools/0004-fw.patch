@@ -1,0 +1,81 @@
+--- b/tools/env/fw_env.c	2016-07-12 00:31:01.000000000 +0530
++++ a/tools/env/fw_env.c	2017-09-04 06:32:18.000000000 +0530
+@@ -976,7 +976,7 @@
+ 
+ static int flash_write (int fd_current, int fd_target, int dev_target)
+ {
+-	int rc;
++	int rc1, rc2;
+ 
+ 	switch (environment.flag_scheme) {
+ 	case FLAG_NONE:
+@@ -998,11 +998,14 @@
+ 		DEVOFFSET (dev_target), DEVNAME (dev_target));
+ #endif
+ 
+-	rc = flash_write_buf(dev_target, fd_target, environment.image,
++	rc1 = flash_write_buf(dev_target, fd_target, environment.image,
+ 			      CUR_ENVSIZE, DEVOFFSET(dev_target),
+ 			      DEVTYPE(dev_target));
+-	if (rc < 0)
+-		return rc;
++	rc2 = flash_write_buf(dev_current, fd_current, environment.image,
++			      CUR_ENVSIZE, DEVOFFSET(dev_current),
++			      DEVTYPE(dev_current));
++	if ((rc1 < 0) && (rc2 < 0))
++		return rc1;
+ 
+ 	if (environment.flag_scheme == FLAG_BOOLEAN) {
+ 		/* Have to set obsolete flag */
+@@ -1157,6 +1160,8 @@
+ 	struct env_image_single *single;
+ 	struct env_image_redundant *redundant;
+ 
++	static unsigned int readFailureMain = 0, readFailureRedundant = 0;
++
+ 	if (!opts)
+ 		opts = &default_opts;
+ 
+@@ -1188,7 +1193,7 @@
+ 
+ 	dev_current = 0;
+ 	if (flash_io (O_RDONLY))
+-		return -1;
++		readFailureMain = 1;
+ 
+ 	crc0 = crc32 (0, (uint8_t *) environment.data, ENV_SIZE);
+ 
+@@ -1200,6 +1205,11 @@
+ 	}
+ 
+ 	crc0_ok = (crc0 == *environment.crc);
++	if(readFailureMain == 1)
++	{
++		fprintf(stderr,"Main environment read failed\n");
++		crc0_ok = 0;
++	}
+ 	if (!HaveRedundEnv) {
+ 		if (!crc0_ok) {
+ 			fprintf (stderr,
+@@ -1225,7 +1235,7 @@
+ 		 */
+ 		environment.image = addr1;
+ 		if (flash_io (O_RDONLY))
+-			return -1;
++			readFailureRedundant = 1;
+ 
+ 		/* Check flag scheme compatibility */
+ 		if (DEVTYPE(dev_current) == MTD_NORFLASH &&
+@@ -1250,6 +1260,12 @@
+ 
+ 		crc1 = crc32 (0, (uint8_t *) redundant->data, ENV_SIZE);
+ 
++		if(readFailureRedundant == 1)
++		{
++			fprintf(stderr,"Redundant environment read failed\n");
++			crc1 = 0;
++		}
++
+ 		if (opts->aes_flag) {
+ 			ret = env_aes_cbc_crypt(redundant->data, 0,
+ 						opts->aes_key);

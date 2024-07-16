@@ -1,0 +1,16 @@
+diff -Naur jpeg-turbo-2.0.1/jmorecfg.h jpeg-turbo_new-2.0.1/jmorecfg.h
+--- jpeg-turbo-2.0.1/jmorecfg.h	2018-11-13 00:50:28.000000000 +0530
++++ jpeg-turbo_new-2.0.1/jmorecfg.h	2020-06-23 09:40:31.762494279 +0530
+@@ -176,10 +176,12 @@
+ #ifndef _BASETSD_H_             /* Microsoft defines it in basetsd.h */
+ #ifndef _BASETSD_H              /* MinGW is slightly different */
+ #ifndef QGLOBAL_H               /* Qt defines it in qglobal.h */
++#ifndef MX_INT32
+ typedef long INT32;
+ #endif
+ #endif
+ #endif
++#endif
+ #endif
+ 
+ /* Datatype used for image dimensions.  The JPEG standard only supports

@@ -1,0 +1,15 @@
+--- ./networking.c	2012-09-10 11:52:34.293962948 +0530
++++ ./sntp/networking.c	2012-09-10 11:53:38.000000000 +0530
+@@ -421,12 +421,6 @@
+ 			/* There are other interesting kiss codes which might be interesting for authentication */
+ 		}
+ 	}
+-	/* If the server is not synced it's not really useable for us */
+-	if (LEAP_NOTINSYNC == PKT_LEAP(rpkt->li_vn_mode)) {
+-		if (ENABLED_OPT(NORMALVERBOSE)) 
+-			printf("sntp %s: Server not in sync, skipping this server\n", func_name);
+-		return SERVER_UNUSEABLE;
+-	}
+ 
+ 	/*
+ 	 * Decode the org timestamp and make sure we're getting a response

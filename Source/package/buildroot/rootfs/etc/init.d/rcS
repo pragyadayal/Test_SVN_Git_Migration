@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Include config file
+. /etc/init.d/rc.conf
+
+if [ -f $MAINFS_START_LOG_DIR/$MAINFS_START_LOG_FILE ]
+then
+	mv $MAINFS_START_LOG_DIR/$MAINFS_START_LOG_FILE $MAINFS_START_LOG_DIR/prev_$MAINFS_START_LOG_FILE
+fi
+
+# Export Variables 
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/matrix/bin:/matrix/script:/etc/scripts:$MATRIX_EXPORT_PATH
+export LD_LIBRARY_PATH=$MATRIX_LD_LIB_PATH
+
+export HOSTNAME
+
+echo "Info: Running rcS on system init"
+
+
+chmod 777 /etc/scripts/device_table.sh
+/etc/scripts/device_table.sh
+
+#Run services based on "S*" symbol 
+if [ -z "$1" ]
+then 
+echo "Info: No argument are supplied to rcS"
+for i in /etc/rc.d/S*; do
+	SERVICE_NAME="rcS"
+	echo "Info: $i"
+	[ -x $i ] && $i start $CONFIG_PATH
+done
+else
+for i in /etc/rc.d/$1*; do
+	SERVICE_NAME="rcS"
+	echo "Info: $i"
+	[ -x $i ] && $i $2 $CONFIG_PATH
+done
+fi
+#End of rcS

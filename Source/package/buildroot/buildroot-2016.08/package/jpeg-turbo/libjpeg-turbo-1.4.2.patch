@@ -1,0 +1,15 @@
+--- 1/jmorecfg.h	2015-09-22 00:18:32.000000000 +0530
++++ 2/jmorecfg.h	2019-12-19 15:30:32.239402111 +0530
+@@ -153,10 +153,12 @@
+ #ifndef _BASETSD_H		/* MinGW is slightly different */
+ #ifndef QGLOBAL_H		/* Qt defines it in qglobal.h */
+ #define __INT32_IS_ACTUALLY_LONG
++#ifndef MX_INT32
+ typedef long INT32;
+ #endif
+ #endif
+ #endif
++#endif
+ #endif
+ 
+ /* Datatype used for image dimensions.  The JPEG standard only supports

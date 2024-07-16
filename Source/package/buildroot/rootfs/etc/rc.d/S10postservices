@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+#################################################################################################
+# PURPOSE	: Currently this script not do any operation, if required to do some operation 
+#		: in future, please mention that information here
+###################################################################################################
+. $2
+
+SERVICE_NAME=`basename $0`
+
+for i in $POST_DRIVERS_LOAD
+do
+	if [ -f /etc/scripts/loadDrivers ]
+	then
+	{
+		DEVICE_FILE_NAME=$i.ko
+		chmod +x /etc/scripts/loadDrivers
+		/etc/scripts/loadDrivers start $i $DEVICE_FILE_NAME
+	}
+	else
+	{
+		platform_debug "MAIN_FS:INFO: LoadDrivers file is not present at path /etc/systemScripts/"
+		exit
+	}
+	fi
+done
+#End of Script
+

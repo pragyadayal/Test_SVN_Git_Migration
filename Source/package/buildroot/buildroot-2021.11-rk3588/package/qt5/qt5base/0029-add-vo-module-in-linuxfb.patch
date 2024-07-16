@@ -1,0 +1,888 @@
+diff --git a/src/platformsupport/fbconvenience/qfbcursor.cpp b/src/platformsupport/fbconvenience/qfbcursor.cpp
+index e0f6b69..e08397f 100644
+--- a/src/platformsupport/fbconvenience/qfbcursor.cpp
++++ b/src/platformsupport/fbconvenience/qfbcursor.cpp
+@@ -41,6 +41,10 @@
+ #include "qfbscreen_p.h"
+ #include <QtGui/QPainter>
+ #include <QtGui/private/qguiapplication_p.h>
++#include <QtCore/QFile>
++#include <QtCore/QJsonDocument>
++#include <QtCore/QJsonObject>
++#include <QtCore/QJsonArray>
+
+ QT_BEGIN_NAMESPACE
+
+@@ -69,8 +73,39 @@ QFbCursor::QFbCursor(QFbScreen *screen)
+     if (!mVisible)
+         return;
+
++    static QByteArray json = qgetenv("QT_QPA_EGLFS_CURSOR");
++    if (json.isEmpty() == false) {
++        QFile file(QString::fromUtf8(json));
++        if (file.open(QFile::ReadOnly)) {
++            QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
++            QJsonObject object = doc.object();
++
++            QString atlas = object.value(QLatin1String("image")).toString();
++            Q_ASSERT(!atlas.isEmpty());
++
++            const int cursorsPerRow = object.value(QLatin1String("cursorsPerRow")).toDouble();
++            Q_ASSERT(cursorsPerRow);
++            m_cursorAtlas.cursorsPerRow = cursorsPerRow;
++
++            const QJsonArray hotSpots = object.value(QLatin1String("hotSpots")).toArray();
++            Q_ASSERT(hotSpots.count() == Qt::LastCursor + 1);
++            for (int i = 0; i < hotSpots.count(); i++) {
++                QPoint hotSpot(hotSpots[i].toArray()[0].toDouble(), hotSpots[i].toArray()[1].toDouble());
++                m_cursorAtlas.hotSpots << hotSpot;
++            }
++
++            QImage image = QImage(atlas).convertToFormat(QImage::Format_RGBA8888);
++            m_cursorAtlas.cursorWidth = image.width() / m_cursorAtlas.cursorsPerRow;
++            m_cursorAtlas.cursorHeight = image.height() / ((Qt::LastCursor + cursorsPerRow) / cursorsPerRow);
++            m_cursorAtlas.width = image.width();
++            m_cursorAtlas.height = image.height();
++            m_cursorAtlas.image = image;
++        }
++    }
++
+     mCursorImage = new QPlatformCursorImage(0, 0, 0, 0, 0, 0);
+-    setCursor(Qt::ArrowCursor);
++    QCursor cursor(Qt::ArrowCursor);
++    changeCursor(&cursor, 0);
+
+     mDeviceListener = new QFbCursorDeviceListener(this);
+     connect(QGuiApplicationPrivate::inputDeviceManager(), &QInputDeviceManager::deviceListChanged,
+@@ -182,8 +217,24 @@ void QFbCursor::changeCursor(QCursor * widgetCursor, QWindow *window)
+         QPoint spot = widgetCursor->hotSpot();
+         setCursor(widgetCursor->pixmap().toImage(), spot.x(), spot.y());
+     } else {
+-        // system cursor
+-        setCursor(shape);
++        if (m_cursorAtlas.cursorWidth && m_cursorAtlas.cursorHeight) {
++            const int width = m_cursorAtlas.cursorWidth;
++            const int height = m_cursorAtlas.cursorHeight;
++            const qreal ws = (qreal)m_cursorAtlas.cursorWidth / m_cursorAtlas.width;
++            const qreal hs = (qreal)m_cursorAtlas.cursorHeight / m_cursorAtlas.height;
++
++            QRect textureRect(ws * (shape % m_cursorAtlas.cursorsPerRow) * m_cursorAtlas.width,
++                              hs * (shape / m_cursorAtlas.cursorsPerRow) * m_cursorAtlas.height,
++                              width,
++                              height);
++            QPoint hotSpot = m_cursorAtlas.hotSpots[shape];
++            mCursorImage->set(m_cursorAtlas.image.copy(textureRect),
++                              hotSpot.x(),
++                              hotSpot.y());
++        } else {
++            // system cursor
++            setCursor(shape);
++        }
+     }
+     mCurrentRect = getCurrentRect();
+     QPoint mScreenOffset = mScreen->geometry().topLeft(); // global to local translation
+diff --git a/src/platformsupport/fbconvenience/qfbcursor_p.h b/src/platformsupport/fbconvenience/qfbcursor_p.h
+index cc36a24..68aca07 100644
+--- a/src/platformsupport/fbconvenience/qfbcursor_p.h
++++ b/src/platformsupport/fbconvenience/qfbcursor_p.h
+@@ -116,6 +116,16 @@ private:
+     QPlatformCursorImage *mCursorImage;
+     QFbCursorDeviceListener *mDeviceListener;
+     QPoint m_pos;
++
++    // cursor atlas information
++    struct CursorAtlas {
++        CursorAtlas() : cursorsPerRow(0), cursorWidth(0), cursorHeight(0) { }
++        int cursorsPerRow;
++        int width, height; // width and height of the atlas
++        int cursorWidth, cursorHeight; // width and height of cursors inside the atlas
++        QList<QPoint> hotSpots;
++        QImage image;
++    } m_cursorAtlas;
+ };
+
+ QT_END_NAMESPACE
+diff --git a/src/plugins/platforms/linuxfb/linuxfb.pro b/src/plugins/platforms/linuxfb/linuxfb.pro
+index d3a4476..afdf159 100644
+--- a/src/plugins/platforms/linuxfb/linuxfb.pro
++++ b/src/plugins/platforms/linuxfb/linuxfb.pro
+@@ -12,10 +12,15 @@ qtHaveModule(input_support-private): \
+
+ SOURCES = main.cpp \
+           qlinuxfbintegration.cpp \
+-          qlinuxfbscreen.cpp
++          qlinuxfbscreen.cpp \
++          qlinuxfbvoscreen.cpp
+
+ HEADERS = qlinuxfbintegration.h \
+-          qlinuxfbscreen.h
++          qlinuxfbscreen.h \
++          qlinuxfbvoscreen.h
++INCLUDEPATH +=
++
++LIBS += -lrockit
+
+ qtHaveModule(kms_support-private) {
+     QT += kms_support-private
+diff --git a/src/plugins/platforms/linuxfb/qlinuxfbintegration.cpp b/src/plugins/platforms/linuxfb/qlinuxfbintegration.cpp
+index 9e38900..48fb530 100644
+--- a/src/plugins/platforms/linuxfb/qlinuxfbintegration.cpp
++++ b/src/plugins/platforms/linuxfb/qlinuxfbintegration.cpp
+@@ -41,6 +41,7 @@
+ #include "qlinuxfbscreen.h"
+ #if QT_CONFIG(kms)
+ #include "qlinuxfbdrmscreen.h"
++#include "qlinuxfbvoscreen.h"
+ #endif
+
+ #include <QtFontDatabaseSupport/private/qgenericunixfontdatabase_p.h>
+@@ -83,6 +84,8 @@ QLinuxFbIntegration::QLinuxFbIntegration(const QStringList &paramList)
+ #if QT_CONFIG(kms)
+     if (qEnvironmentVariableIntValue("QT_QPA_FB_DRM") != 0)
+         m_primaryScreen = new QLinuxFbDrmScreen(paramList);
++    if (!m_primaryScreen && qEnvironmentVariableIntValue("QT_QPA_FB_VO") != 0)
++        m_primaryScreen = new QLinuxFbVoScreen(paramList);
+ #endif
+     if (!m_primaryScreen)
+         m_primaryScreen = new QLinuxFbScreen(paramList);
+diff --git a/src/plugins/platforms/linuxfb/qlinuxfbvoscreen.cpp b/src/plugins/platforms/linuxfb/qlinuxfbvoscreen.cpp
+new file mode 100644
+index 0000000..1ef80c7
+--- /dev/null
++++ b/src/plugins/platforms/linuxfb/qlinuxfbvoscreen.cpp
+@@ -0,0 +1,609 @@
++#include "qlinuxfbvoscreen.h"
++#include "qlinuxvo.h"
++#include <QLoggingCategory>
++#include <QGuiApplication>
++#include <QPainter>
++#include <QtCore/QRegularExpression>
++#include <QtFbSupport/private/qfbcursor_p.h>
++#include <QtFbSupport/private/qfbwindow_p.h>
++#include <QtFbSupport/private/qfbbackingstore_p.h>
++#include <QtKmsSupport/private/qkmsdevice_p.h>
++#include <QtCore/private/qcore_unix_p.h>
++#include <sys/mman.h>
++
++#include "rockit/rk_debug.h"
++#include "rockit/rk_mpi_sys.h"
++#include "rockit/rk_mpi_vo.h"
++#include "rockit/rk_mpi_vdec.h"
++#include "rockit/rk_mpi_mb.h"
++#include "rockit/rk_common.h"
++
++QT_BEGIN_NAMESPACE
++
++Q_LOGGING_CATEGORY(qLcFbVoDrm, "qt.qpa.fb")
++
++#define TRIPLE_BUFFER
++
++#ifdef TRIPLE_BUFFER
++static const int BUFFER_COUNT = 3;
++#else
++static const int BUFFER_COUNT = 2;
++#endif
++
++static uint32_t bppForDrmFormat(uint32_t drmFormat)
++{
++    switch (drmFormat) {
++    case DRM_FORMAT_RGB565:
++    case DRM_FORMAT_BGR565:
++        return 16;
++    default:
++        return 32;
++    }
++}
++
++static int depthForDrmFormat(uint32_t drmFormat)
++{
++    switch (drmFormat) {
++    case DRM_FORMAT_RGB565:
++    case DRM_FORMAT_BGR565:
++        return 16;
++    case DRM_FORMAT_XRGB8888:
++    case DRM_FORMAT_XBGR8888:
++        return 24;
++    case DRM_FORMAT_XRGB2101010:
++    case DRM_FORMAT_XBGR2101010:
++        return 30;
++    default:
++        return 32;
++    }
++}
++
++static PIXEL_FORMAT_E rkformatForDrmFormat(uint32_t drmFormat)
++{
++    switch (drmFormat) {
++    case DRM_FORMAT_XRGB8888:
++    case DRM_FORMAT_XBGR8888:
++        return RK_FMT_BGRA8888;
++    case DRM_FORMAT_ARGB8888:
++    case DRM_FORMAT_ABGR8888:
++        return RK_FMT_RGBA8888;
++    case DRM_FORMAT_RGB565:
++        return RK_FMT_RGB565;
++    case DRM_FORMAT_BGR565:
++        return RK_FMT_BGR565;
++    case DRM_FORMAT_XRGB2101010:
++        return RK_FMT_RGB101010;
++    case DRM_FORMAT_XBGR2101010:
++        return RK_FMT_BGR101010;
++    case DRM_FORMAT_BGRA8888:
++        return RK_FMT_BGRA8888;
++    case DRM_FORMAT_RGBA8888:
++        return RK_FMT_RGBA8888;
++    case DRM_FORMAT_YUV422:
++        return RK_FMT_YUV422SP_VU;
++    case DRM_FORMAT_NV12:
++        return RK_FMT_YUV420SP;
++    default:
++        return RK_FMT_BUTT;
++    }
++}
++
++static QImage::Format formatForDrmFormat(uint32_t drmFormat)
++{
++    switch (drmFormat) {
++    case DRM_FORMAT_XRGB8888:
++    case DRM_FORMAT_XBGR8888:
++        return QImage::Format_RGB32;
++    case DRM_FORMAT_ARGB8888:
++    case DRM_FORMAT_ABGR8888:
++        return QImage::Format_RGBA8888_Premultiplied;
++    case DRM_FORMAT_RGB565:
++    case DRM_FORMAT_BGR565:
++        return QImage::Format_RGB16;
++    case DRM_FORMAT_XRGB2101010:
++    case DRM_FORMAT_XBGR2101010:
++        return QImage::Format_RGB30;
++    case DRM_FORMAT_ARGB2101010:
++    case DRM_FORMAT_ABGR2101010:
++        return QImage::Format_A2RGB30_Premultiplied;
++    default:
++        return QImage::Format_ARGB32;
++    }
++}
++
++static RK_S32 VO_StartDev(VO_DEV VoDev) {
++
++    RK_S32 s32Ret;
++    VO_PUB_ATTR_S stVoPubAttr;
++
++    s32Ret = RK_MPI_VO_GetPubAttr(VoDev, &stVoPubAttr);
++    if (s32Ret != RK_SUCCESS){
++        qCritical("[%s:%d]: [RK_MPI_VO_GetPubAttr] s32Ret=0x%x", __FUNCTION__, __LINE__, s32Ret);
++        return RK_FAILURE;
++    }
++
++    if (stVoPubAttr.enIntfType == VO_INTF_HDMI) {
++        return RK_SUCCESS;
++    }
++
++    stVoPubAttr.enIntfType = VO_INTF_HDMI;
++    stVoPubAttr.enIntfSync = (VO_INTF_SYNC_E)qEnvironmentVariableIntValue("QT_QPA_FB_VO_RESOLUTION");
++    if (stVoPubAttr.enIntfSync == 0) {
++        stVoPubAttr.enIntfSync = VO_OUTPUT_1080P60;
++    }
++
++    s32Ret = RK_MPI_VO_SetPubAttr(VoDev, &stVoPubAttr);
++    if (s32Ret != RK_SUCCESS) {
++        qCritical("[%s:%d]: [RK_MPI_VO_SetPubAttr] s32Ret=0x%x", __FUNCTION__, __LINE__, s32Ret);
++        return RK_FAILURE;
++    }
++
++    s32Ret = RK_MPI_VO_Enable(VoDev);
++    if (s32Ret != RK_SUCCESS) {
++        qCritical("[%s:%d]: [RK_MPI_VO_Enable] s32Ret=0x%x", __FUNCTION__, __LINE__, s32Ret);
++        return RK_FAILURE;
++    }
++
++     return s32Ret;
++}
++
++static RK_S32 VO_StartLayer(VO_LAYER VoLayer, PIXEL_FORMAT_E format, RK_S32 dispWidth, RK_S32 dispHeight) {
++
++    RK_S32 s32Ret;
++    VO_VIDEO_LAYER_ATTR_S stLayerAttr;
++
++    memset(&stLayerAttr, 0, sizeof(stLayerAttr));
++    stLayerAttr.enPixFormat = format;
++    stLayerAttr.stDispRect.s32X = 0;
++    stLayerAttr.stDispRect.s32Y = 0;
++    stLayerAttr.u32DispFrmRt = 30;
++    stLayerAttr.enCompressMode = COMPRESS_AFBC_16x16;
++
++    if (qEnvironmentVariableIntValue("QT_QPA_FB_4K_DISP") == 1) {
++        stLayerAttr.stDispRect.u32Width = 3840;
++        stLayerAttr.stDispRect.u32Height = 2160;
++    } else {
++        stLayerAttr.stDispRect.u32Width = dispWidth;
++        stLayerAttr.stDispRect.u32Height = dispHeight;
++    }
++
++    stLayerAttr.stImageSize.u32Width = dispWidth;
++    stLayerAttr.stImageSize.u32Height = dispHeight;
++
++    s32Ret = RK_MPI_VO_SetLayerAttr(VoLayer, &stLayerAttr);
++    if (s32Ret != RK_SUCCESS) {
++        qCritical("[%s:%d]: [RK_MPI_VO_SetLayerAttr] s32Ret=0x%x", __FUNCTION__, __LINE__, s32Ret);
++        return RK_FAILURE;
++    }
++
++    s32Ret = RK_MPI_VO_EnableLayer(VoLayer);
++    if (s32Ret != RK_SUCCESS){
++        qCritical("[%s:%d]: [RK_MPI_VO_EnableLayer] s32Ret=0x%x", __FUNCTION__, __LINE__, s32Ret);
++        return RK_FAILURE;
++    }
++
++    qDebug("[%s:%d]: [format=%d], [width=%d], [height=%d]", __FUNCTION__, __LINE__, format, dispWidth, dispHeight);
++    return s32Ret;
++}
++
++static RK_S32 VO_StopDev(VO_DEV VoDev) {
++
++    return RK_MPI_VO_Disable(VoDev);
++}
++
++static RK_S32 VO_StopLayer(VO_LAYER VoLayer) {
++
++    return RK_MPI_VO_DisableLayer(VoLayer);
++}
++
++class QLinuxFbVoDevice : public QKmsDevice
++{
++public:
++    QSize voResolution;
++    struct Framebuffer {
++        Framebuffer() : handle(0), pitch(0), size(0), fb(0), p(MAP_FAILED) { }
++        uint32_t handle;
++        uint32_t pitch;
++        uint64_t size;
++        uint32_t fb;
++        void *p;
++        QImage wrapper;
++    };
++
++    struct Output {
++        Output() : backFb(0), flipPending(false) { }
++        QKmsOutput kmsOutput;
++        Framebuffer fb[BUFFER_COUNT];
++        QRegion dirty[BUFFER_COUNT];
++        int backFb;
++        bool flipPending;
++        QSize currentRes() const {
++            const drmModeModeInfo &modeInfo(kmsOutput.modes[kmsOutput.mode]);
++            return QSize(modeInfo.hdisplay, modeInfo.vdisplay);
++        }
++    };
++
++    QLinuxFbVoDevice(QKmsScreenConfig *screenConfig);
++
++    bool open() override;
++    void close() override;
++
++    void createFramebuffers();
++    void destroyFramebuffers();
++
++    void setMode(Output *output);
++    void swapBuffers(Output *output);
++    void waitForFlip(Output *output);
++
++    int outputCount() const { return m_outputs.count(); }
++    Output *output(int idx) { return &m_outputs[idx]; }
++    int voBufferCount() const {return vo_buffers.size();}
++    void* getVoBuffer(int idx) {return vo_buffers[idx];}
++
++    void startLayer(Output* output);
++
++private:
++    void *nativeDisplay() const override;
++    QPlatformScreen *createScreen(const QKmsOutput &output) override;
++    void registerScreen(QPlatformScreen *screen,
++                        bool isPrimary,
++                        const QPoint &virtualPos,
++                        const QList<QPlatformScreen *> &virtualSiblings) override;
++
++    bool createFramebuffer(Output *output, int bufferIdx);
++    void destroyFramebuffer(Output *output, int bufferIdx);
++
++    static void pageFlipHandler(int fd, unsigned int sequence,
++                                unsigned int tv_sec, unsigned int tv_usec, void *user_data);
++
++    QVector<Output>     m_outputs;
++    std::vector<void*>  vo_buffers;
++    RK_S32              vodev;
++    VO_LAYER            volayer;
++};
++
++QLinuxFbVoDevice::QLinuxFbVoDevice(QKmsScreenConfig *screenConfig)
++    : QKmsDevice(screenConfig, QStringLiteral("/dev/dri/card0"))
++{
++    /* Set RK VO device and layer */
++    vodev = RK356X_VO_DEV_HD0;
++    volayer = RK356X_VOP_LAYER_ESMART_0;
++}
++
++bool QLinuxFbVoDevice::open()
++{
++    int fd = qt_safe_open(devicePath().toLocal8Bit().constData(), O_RDWR | O_CLOEXEC);
++    if (fd == -1) {
++        qErrnoWarning("Could not open DRM device %s", qPrintable(devicePath()));
++        return false;
++    }
++
++    uint64_t hasDumbBuf = 0;
++    if (drmGetCap(fd, DRM_CAP_DUMB_BUFFER, &hasDumbBuf) == -1 || !hasDumbBuf) {
++        qWarning("Dumb buffers not supported");
++        qt_safe_close(fd);
++        return false;
++    }
++
++    setFd(fd);
++
++    qCDebug(qLcFbVoDrm, "DRM device %s opened", qPrintable(devicePath()));
++
++    /* Init RK MPI interface, device and layer */
++    RK_MPI_SYS_Init();
++    RK_MPI_VO_BindLayer(volayer, vodev, VO_LAYER_MODE_GRAPHIC);
++    VO_StartDev(vodev);
++    return true;
++}
++
++void QLinuxFbVoDevice::startLayer(Output* output)
++{
++    VO_StartLayer(volayer, rkformatForDrmFormat(output->kmsOutput.drm_format), voResolution.width(), voResolution.height());
++}
++
++void QLinuxFbVoDevice::close()
++{
++    for (Output &output : m_outputs)
++        output.kmsOutput.cleanup(this); // restore mode
++
++    m_outputs.clear();
++
++    if (fd() != -1) {
++        qCDebug(qLcFbVoDrm, "Closing DRM device");
++        qt_safe_close(fd());
++        setFd(-1);
++    }
++
++    VO_StopLayer(volayer);
++    VO_StopDev(vodev);
++    RK_MPI_VO_CloseFd();
++}
++
++void *QLinuxFbVoDevice::nativeDisplay() const
++{
++    Q_UNREACHABLE();
++    return nullptr;
++}
++
++QPlatformScreen *QLinuxFbVoDevice::createScreen(const QKmsOutput &output)
++{
++    qCDebug(qLcFbVoDrm, "Got a new output: %s", qPrintable(output.name));
++    Output o;
++    o.kmsOutput = output;
++    m_outputs.append(o);
++    return nullptr; // no platformscreen, we are not a platform plugin
++}
++
++void QLinuxFbVoDevice::registerScreen(QPlatformScreen *screen,
++                                    bool isPrimary,
++                                    const QPoint &virtualPos,
++                                    const QList<QPlatformScreen *> &virtualSiblings)
++{
++    Q_UNUSED(screen);
++    Q_UNUSED(isPrimary);
++    Q_UNUSED(virtualPos);
++    Q_UNUSED(virtualSiblings);
++    Q_UNREACHABLE();
++}
++
++bool QLinuxFbVoDevice::createFramebuffer(QLinuxFbVoDevice::Output *output, int bufferIdx)
++{
++    const uint32_t w = voResolution.width();
++    const uint32_t h = voResolution.height();
++    const uint32_t bpp = bppForDrmFormat(output->kmsOutput.drm_format);
++    RK_S8 *pData = NULL;
++    RK_U32 u32BuffSize;
++    VO_FRAME_INFO_S stFrameInfo;
++    RK_VOID *pMblk = NULL;
++
++    PIXEL_FORMAT_E format = rkformatForDrmFormat(output->kmsOutput.drm_format);
++    u32BuffSize = RK_MPI_VO_CreateGraphicsFrameBuffer(w, h, (RK_U32)format, &pMblk);
++    if (u32BuffSize == 0) {
++        qCritical("can not create gfx buffer");
++        return false;
++    }
++
++    vo_buffers.push_back(pMblk);
++    RK_MPI_VO_GetFrameInfo(pMblk, &stFrameInfo);
++    pData = reinterpret_cast<RK_S8 *>(stFrameInfo.pData);
++
++    Framebuffer &fb(output->fb[bufferIdx]);
++    fb.handle = 0;//creq.handle;
++    fb.pitch = w*bpp/8;//creq.pitch;
++    fb.size = u32BuffSize;
++    fb.p = pData;
++
++    qCDebug(qLcFbVoDrm, "Got a dumb buffer: fb=%p size=%dx%d, bpp=%u, handle=%u, pitch=%u, size=%u", pData, w, h, bpp, fb.handle, fb.pitch, (uint) fb.size);
++    fb.wrapper = QImage(static_cast<uchar *>(fb.p), w, h, fb.pitch, formatForDrmFormat(output->kmsOutput.drm_format));
++
++    return true;
++}
++
++void QLinuxFbVoDevice::createFramebuffers()
++{
++    for (Output &output : m_outputs) {
++        for (int i = 0; i < BUFFER_COUNT; ++i) {
++            if (!createFramebuffer(&output, i))
++                return;
++        }
++        output.backFb = 0;
++        output.flipPending = false;
++    }
++}
++
++
++void QLinuxFbVoDevice::destroyFramebuffer(QLinuxFbVoDevice::Output *output, int bufferIdx)
++{
++    Framebuffer &fb(output->fb[bufferIdx]);
++    RK_VOID *pMblk = getVoBuffer(bufferIdx);
++    if (pMblk)
++        RK_MPI_VO_DestroyGraphicsFrameBuffer(pMblk);
++    pMblk = NULL;
++    fb = Framebuffer();
++}
++
++void QLinuxFbVoDevice::destroyFramebuffers()
++{
++    for (Output &output : m_outputs) {
++        for (int i = 0; i < BUFFER_COUNT; ++i)
++            destroyFramebuffer(&output, i);
++    }
++}
++
++void QLinuxFbVoDevice::setMode(Output *output)
++{
++    drmModeModeInfo &modeInfo(output->kmsOutput.modes[output->kmsOutput.mode]);
++
++    if (output->kmsOutput.mode_set)
++        return;
++
++    if (drmModeSetCrtc(fd(), output->kmsOutput.crtc_id, output->fb[0].fb, 0, 0,
++                       &output->kmsOutput.connector_id, 1, &modeInfo) == -1) {
++        qErrnoWarning(errno, "Failed to set mode");
++        return;
++    }
++
++    output->kmsOutput.mode_set = true; // have cleanup() to restore the mode
++    output->kmsOutput.setPowerState(this, QPlatformScreen::PowerStateOn);
++}
++
++
++void QLinuxFbVoDevice::pageFlipHandler(int fd, unsigned int sequence,
++                                     unsigned int tv_sec, unsigned int tv_usec,
++                                     void *user_data)
++{
++    Q_UNUSED(fd);
++    Q_UNUSED(sequence);
++    Q_UNUSED(tv_sec);
++    Q_UNUSED(tv_usec);
++
++    Output *output = static_cast<Output *>(user_data);
++
++#ifndef TRIPLE_BUFFER
++    // The next buffer would be available after flipped
++    output->backFb = (output->backFb + 1) % BUFFER_COUNT;
++#endif
++
++    output->flipPending = false;
++}
++
++void QLinuxFbVoDevice::waitForFlip(Output *output)
++{
++    Q_UNUSED(output);
++}
++
++void QLinuxFbVoDevice::swapBuffers(Output *output)
++{
++#ifdef TRIPLE_BUFFER
++    // Wait flip to make sure last buffer displayed
++    waitForFlip(output);
++#endif
++
++    //setMode(output);
++    RK_VOID *pMblk = getVoBuffer(output->backFb);//vo_output[buffIdx];
++    VIDEO_FRAME_INFO_S stVFrame;
++
++    memset(&stVFrame, 0, sizeof(stVFrame));
++    stVFrame.stVFrame.u32Width = voResolution.width();
++    stVFrame.stVFrame.u32Height = voResolution.height();
++    stVFrame.stVFrame.u32VirWidth = voResolution.width();
++    stVFrame.stVFrame.u32VirHeight = voResolution.height();
++    stVFrame.stVFrame.enPixelFormat = rkformatForDrmFormat(output->kmsOutput.drm_format);
++    stVFrame.stVFrame.pMbBlk = pMblk;
++
++    RK_S32 s32Ret = RK_MPI_VO_SendLayerFrame(volayer, &stVFrame);
++    if (s32Ret != RK_SUCCESS) {
++        qCritical("[%s:%d]: [RK_MPI_VO_SendLayerFrame] s32Ret=0x%x", __FUNCTION__, __LINE__, s32Ret);
++    }
++
++    output->flipPending = true;
++
++#ifdef TRIPLE_BUFFER
++    // The next buffer should always available in triple buffer case.
++    output->backFb = (output->backFb + 1) % BUFFER_COUNT;
++#endif
++}
++
++////////////////////////////////////////////////////////////////////////////////////////////
++QLinuxFbVoScreen::QLinuxFbVoScreen(const QStringList &args)
++    : m_screenConfig(nullptr),
++      m_device(nullptr),
++      userSize(0, 0)
++{
++    QRegularExpression sizeRx(QLatin1String("size=(\\d+)x(\\d+)"));
++
++    for (const QString &arg : qAsConst(args)) {
++        QRegularExpressionMatch match;
++        if (arg.contains(sizeRx, &match))
++            userSize = QSize(match.captured(1).toInt(), match.captured(2).toInt());
++    }
++}
++
++QLinuxFbVoScreen::~QLinuxFbVoScreen()
++{
++    if (m_device) {
++        m_device->destroyFramebuffers();
++        m_device->close();
++        delete m_device;
++    }
++    delete m_screenConfig;
++}
++
++bool QLinuxFbVoScreen::initialize()
++{
++    m_screenConfig = new QKmsScreenConfig;
++    m_device = new QLinuxFbVoDevice(m_screenConfig);
++    if (!m_device->open()) {
++        qWarning("Unable to open framebuffer device.");
++        return false;
++    }
++
++    // Discover outputs. Calls back Device::createScreen().
++    m_device->createScreens();
++
++    QLinuxFbVoDevice::Output *output(m_device->output(0));
++
++    if (userSize.isNull()) {
++        m_device->voResolution = output->currentRes();
++    } else {
++        m_device->voResolution = userSize;
++    }
++
++    // Now off to dumb buffer specifics.
++    m_device->createFramebuffers();
++
++    m_device->startLayer(output);
++
++    mGeometry = QRect(QPoint(0, 0), m_device->voResolution);
++    mDepth = depthForDrmFormat(output->kmsOutput.drm_format);
++    mFormat = formatForDrmFormat(output->kmsOutput.drm_format);
++    mPhysicalSize = output->kmsOutput.physical_size;
++    qCDebug(qLcFbVoDrm) << mGeometry << mPhysicalSize << mDepth << mFormat;
++
++    QFbScreen::initializeCompositor();
++
++    mCursor = new QFbCursor(this);
++
++    return true;
++}
++
++QRegion QLinuxFbVoScreen::doRedraw()
++{
++    const QRegion dirty = QFbScreen::doRedraw();
++    if (dirty.isEmpty())
++        return dirty;
++
++    QLinuxFbVoDevice::Output *output(m_device->output(0));
++
++    for (int i = 0; i < BUFFER_COUNT; ++i)
++        output->dirty[i] += dirty;
++
++#ifndef TRIPLE_BUFFER
++    // Wait flip before accessing new buffer
++    m_device->waitForFlip(output);
++#endif
++
++    if (output->fb[output->backFb].wrapper.isNull())
++        return dirty;
++
++    QPainter pntr(&output->fb[output->backFb].wrapper);
++
++    if (QFbBackingStore::hasScreenImage() && QFbBackingStore::hasFbImage())
++        goto swap;
++
++    // Image has alpha but no need for blending at this stage.
++    // Do not waste time with the default SourceOver.
++    pntr.setCompositionMode(QPainter::CompositionMode_Source);
++    for (const QRect &rect : qAsConst(output->dirty[output->backFb])) {
++        pntr.drawImage(rect, mScreenImage, rect);
++        pntr.resetTransform();
++    }
++    pntr.end();
++swap:
++    output->dirty[output->backFb] = QRegion();
++
++    m_device->swapBuffers(output);
++
++    static int count_down = BUFFER_COUNT;
++    if (count_down || m_device->outputCount() > 1) {
++        count_down --;
++        QFbBackingStore::setFbImage(NULL);
++    } else {
++        QFbBackingStore::setFbImage(&output->fb[output->backFb].wrapper);
++    }
++
++    return dirty;
++}
++
++QPixmap QLinuxFbVoScreen::grabWindow(WId wid, int x, int y, int width, int height) const
++{
++    Q_UNUSED(wid);
++    Q_UNUSED(x);
++    Q_UNUSED(y);
++    Q_UNUSED(width);
++    Q_UNUSED(height);
++
++    return QPixmap();
++}
++
++QT_END_NAMESPACE
+diff --git a/src/plugins/platforms/linuxfb/qlinuxfbvoscreen.h b/src/plugins/platforms/linuxfb/qlinuxfbvoscreen.h
+new file mode 100644
+index 0000000..d144d83
+--- /dev/null
++++ b/src/plugins/platforms/linuxfb/qlinuxfbvoscreen.h
+@@ -0,0 +1,70 @@
++/****************************************************************************
++**
++** Copyright (C) 2016 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the plugins of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see https://www.qt.io/terms-conditions. For further
++** information use the contact form at https://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 3 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL3 included in the
++** packaging of this file. Please review the following information to
++** ensure the GNU Lesser General Public License version 3 requirements
++** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 2.0 or (at your option) the GNU General
++** Public license version 3 or any later version approved by the KDE Free
++** Qt Foundation. The licenses are as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
++** included in the packaging of this file. Please review the following
++** information to ensure the GNU General Public License requirements will
++** be met: https://www.gnu.org/licenses/gpl-2.0.html and
++** https://www.gnu.org/licenses/gpl-3.0.html.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef QLINUXFBVOSCREEN_H
++#define QLINUXFBVOSCREEN_H
++
++#include <QtFbSupport/private/qfbscreen_p.h>
++#include <vector>
++
++QT_BEGIN_NAMESPACE
++
++class QKmsScreenConfig;
++class QLinuxFbVoDevice;
++
++class QLinuxFbVoScreen : public QFbScreen
++{
++    Q_OBJECT
++public:
++    QLinuxFbVoScreen(const QStringList &args);
++    ~QLinuxFbVoScreen();
++
++    bool initialize() override;
++    QRegion doRedraw() override;
++    QPixmap grabWindow(WId wid, int x, int y, int width, int height) const override;
++
++private:
++    QKmsScreenConfig *m_screenConfig;
++    QLinuxFbVoDevice *m_device;
++    QSize userSize;
++};
++
++QT_END_NAMESPACE
++
++#endif // QLINUXFBDRMSCREEN_H
+diff --git a/src/plugins/platforms/linuxfb/qlinuxvo.h b/src/plugins/platforms/linuxfb/qlinuxvo.h
+new file mode 100644
+index 0000000..cccd4a3
+--- /dev/null
++++ b/src/plugins/platforms/linuxfb/qlinuxvo.h
+@@ -0,0 +1,43 @@
++#ifndef QLINUX_VO_H
++#define QLINUX_VO_H
++
++#define RK356X_VOP_LAYER_CLUSTER_0      0
++#define RK356X_VOP_LAYER_CLUSTER_1      2
++#define RK356X_VOP_LAYER_ESMART_0       4
++#define RK356X_VOP_LAYER_ESMART_1       5
++#define RK356X_VOP_LAYER_SMART_0        6
++#define RK356X_VOP_LAYER_SMART_1        7
++
++#define RK356X_VO_DEV_HD0               0
++#define RK356X_VO_DEV_HD1               1
++
++#define DISPLAY_TYPE_HDMI                0
++#define DISPLAY_TYPE_EDP                 1
++#define DISPLAY_TYPE_VGA                 2
++
++#define MAX_VO_FORMAT_RGB_NUM            4
++#define TEST_VO_FORMAT_ARGB8888          0
++#define TEST_VO_FORMAT_ABGR8888          1
++#define TEST_VO_FORMAT_RGB888            2
++#define TEST_VO_FORMAT_BGR888            3
++#define TEST_VO_FORMAT_ARGB1555          4
++#define TEST_VO_FORMAT_ABGR1555          5
++#define TEST_VO_FORMAT_NV12              6
++#define TEST_VO_FORMAT_NV21              7
++
++#define VO_CHANNEL_PLAY_NORMAL           0
++#define VO_CHANNEL_PLAY_PAUSE            1
++#define VO_CHANNEL_PLAY_STEP             2
++#define VO_CHANNEL_PLAY_SPEED            3
++
++#define WBC_SOURCE_DEV                0
++#define WBC_SOURCE_VIDEO              1
++#define WBC_SOURCE_GRAPHIC            2
++
++#define MAX_WINDOWS_NUM               64
++#define MAX_STEP_FRAME_NUM            50
++
++#define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
++
++
++#endif
+\ No newline at end of file

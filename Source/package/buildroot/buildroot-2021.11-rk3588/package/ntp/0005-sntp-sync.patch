@@ -1,0 +1,18 @@
+diff -ruN a/sntp/networking.c b/sntp/networking.c
+--- a/sntp/networking.c	2020-03-04 05:11:29.000000000 +0530
++++ b/sntp/networking.c	2023-04-21 12:06:02.000000000 +0530
+@@ -263,12 +263,14 @@
+ 		}
+ 	}
+ 	/* If the server is not synced it's not really useable for us */
++	/*
+ 	if (LEAP_NOTINSYNC == PKT_LEAP(rpkt->li_vn_mode)) {
+ 		msyslog(LOG_ERR,
+ 			"%s: %s not in sync, skipping this server",
+ 			func_name, stoa(sender));
+ 		return SERVER_UNUSEABLE;
+ 	}
++	*/ 
+ 
+ 	/*
+ 	 * Decode the org timestamp and make sure we're getting a response

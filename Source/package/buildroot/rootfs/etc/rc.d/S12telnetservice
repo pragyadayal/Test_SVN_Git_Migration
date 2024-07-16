@@ -1,0 +1,31 @@
+#!/bin/sh 
+# include platform_common script for debug..
+. $2
+
+SERVICE_NAME=`basename $0`
+
+if [ "$SSH_SERVICE_ENABLE"  == "YES" ]
+then
+	platform_debug "Info: telnet service is disable"
+	exit
+fi
+
+if [ "$1" = "start" ]
+then
+	if [ -f /usr/sbin/telnetd ]
+	then
+		platform_debug "INFO: Running telnetd deamon start"
+		chmod 755 /usr/sbin/telnetd
+		/usr/sbin/telnetd &
+	fi
+fi
+
+if [ "$1" = "stop" ]
+then
+	if [ -f /usr/sbin/telnetd ]
+	then
+		platform_debug "INFO: Telnetd deamon stop"
+		killall telnetd
+	fi
+fi
+#End of Script

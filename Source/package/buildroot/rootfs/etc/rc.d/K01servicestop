@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Stoping SSH
+chmod +x /etc/ssh/startstop.sh
+/etc/ssh/startstop.sh 0
+
+#End of Script

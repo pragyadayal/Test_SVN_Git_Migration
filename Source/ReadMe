@@ -1,0 +1,32 @@
+Build procedure:
+
+=> For complete build 
+
+	"make BOARD_TYPE=<board type> all FIRMWARE_RELEASE_DIR_PATH=<svn://192.168.100.5/...> GENERIC_PLATFORM_PATH=<Trunk/Release dir path of local build system> PRODUCT_VERSION=V01 PRODUCT_REVISION=R00 PRODUCT_PATCH=00"
+
+=> For release build, 
+
+	"make BOARD_TYPE=<board type> release FIRMWARE_RELEASE_DIR_PATH=<svn://192.168.100.5/...> GENERIC_PLATFORM_PATH=<Trunk/Release dir path of local build system> PRODUCT_VERSION=V01 PRODUCT_REVISION=R00 PRODUCT_PATCH=00"
+	
+	Note: It will build 'packages' 'drivers' and 'rootfs'
+
+=> Build result path
+
+	"./build/<board type>/output"
+
+=> Supported board types
+	'NETRA_IPC_8MP' 'PANEL_LITE_V2' 'ATOM' 'ARGO_FR' 'RASPBERRY_PI_4'
+
+--------------------------------------------------------------------------------------------------------------------
+
+=> Platform production release binary path
+
+	"svn://192.168.100.5/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/Software_Releases/<board type>/Production/<PRODUCT_VERSION>.<PRODUCT_REVISION>.<PRODUCT_PATCH>/image"
+	
+=> Platform QA release binary path
+
+	"svn://192.168.100.5/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/Software_Releases/<board type>/QA/<PRODUCT_VERSION>.<PRODUCT_REVISION>.<PRODUCT_PATCH>/image"
+	
+=> Guide docs
+
+	"svn://192.168.100.5/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/SWD/Trunk/Study_Reports_Design/secure_booting_secure_firmware.odt"

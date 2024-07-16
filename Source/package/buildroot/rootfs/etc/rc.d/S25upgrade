@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+#################################################################################################
+# SCRIPT	: S30ipcqcreator
+# AUTHOR	: Sourabh Jain
+# DATE		: 09/07/2018
+# PLATFORM	: MIB
+# PURPOSE	: This script will run upgrade process
+###################################################################################################
+
+# Calling service script present in /etc/scripts path.
+# start upgrad process from here
+echo "call upgrade script"
+/matrix/scripts/upgrade.sh

@@ -1,0 +1,17 @@
+--- ntp-4.2.8p9/sntp/networking.c	2016-01-20 14:26:20.000000000 +0530
++++ ntp/sntp/networking.c	2018-01-30 18:28:29.572291785 +0530
+@@ -258,12 +258,14 @@
+ 		}
+ 	}
+ 	/* If the server is not synced it's not really useable for us */
++	/*
+ 	if (LEAP_NOTINSYNC == PKT_LEAP(rpkt->li_vn_mode)) {
+ 		msyslog(LOG_ERR,
+ 			"%s: %s not in sync, skipping this server",
+ 			func_name, stoa(sender));
+ 		return SERVER_UNUSEABLE;
+ 	}
++	*/
+ 
+ 	/*
+ 	 * Decode the org timestamp and make sure we're getting a response

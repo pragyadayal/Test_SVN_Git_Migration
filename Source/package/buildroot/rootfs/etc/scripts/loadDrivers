@@ -1,0 +1,86 @@
+#!/bin/sh
+#include config file
+. $4
+
+DRIVER_PARAM=board_type=$BOARD_TYPE
+DEVICE_FILE=$3
+DEVICE_NAME=$2
+
+	case "$1" in
+	start)
+	
+		platform_debug "MAIN_FS:INFO: Starting Matrix $DEVICE_NAME Module"
+
+		if [ -e /dev/${DEVICE_NAME} ]
+		then	
+		{
+			rm -f /dev/${DEVICE_NAME}*
+		}
+		else
+		{
+			platform_debug "MAIN_FS:INFO: $DEVICE_NAME is not present"
+		}
+		fi
+		
+		insmod $DRIVERS_PATH/$DEVICE_FILE $DRIVER_PARAM
+
+		if [ "$?" -eq 0 ]
+		then
+		{
+			platform_debug "MAIN_FS:INFO: $DEVICE_FILE is inserted sucessfully"
+		}
+		else
+		{
+			platform_debug "MAIN_FS:INFO: $DEVICE_FILE insertion failed."
+			exit 
+		}
+		fi
+		
+		for i in `grep $DEVICE_NAME /proc/devices` ; do
+		if [ $i != $DEVICE_NAME ]; then
+		{
+			major=$i
+			break;
+		}
+		fi
+		done
+		
+		if [ $major -ne 0 ]; then                                                  
+                {                                                                          
+                         mknod /dev/${DEVICE_NAME} c $major 0                        
+                }                                                                    
+                fi
+		;;
+	stop)
+		if [ -e /dev/${DEVICE_NAME} ]
+		then	
+		{
+			rm -f /dev/${DEVICE_NAME}*
+		}
+		else
+		{
+			platform_debug "MAIN_FS:INFO:: $DEVICE_NAME is not present into the /dev folder."
+			exit
+		}
+		fi
+		
+		rmmod $DEVICE_NAME
+		
+		if [ "$?" -eq 0 ]
+		then
+		{
+			platform_debug "MAIN_FS:INFO: $DEVICE_FILE is removed sucessfully"
+		}
+		else
+		{
+			platform_debug "MAIN_FS:INFO: $DEVICE_FILE is not removed sucessfully"
+			exit 
+		}
+		fi
+		;;
+		*)
+	platform_debug "Usage: $0 {start|stop|driver_name}"
+	exit 1
+	;;
+	esac
+	exit 0
