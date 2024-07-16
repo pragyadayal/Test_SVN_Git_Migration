@@ -17,7 +17,7 @@ source:
 	$(shell if [ ! -d "$(PLATFORM_ROOTFS_BUILD_PATH)" ]; then mkdir -p $(PLATFORM_ROOTFS_BUILD_PATH); fi ;)
 	
 	@if [ ! -f $(PLATFORM_ROOTFS_BUILD_PATH)/.source ]; then \
-		svn export --force $(OS_IMAGE_SOURCE_PATH) $(PLATFORM_ROOTFS_BUILD_PATH); \
+		svn $(SVN_CREDENTIALS) export --force $(OS_IMAGE_SOURCE_PATH) $(PLATFORM_ROOTFS_BUILD_PATH); \
 		touch $(PLATFORM_ROOTFS_BUILD_PATH)/.source; \
 	fi
 	
@@ -89,10 +89,10 @@ patch:
 	mkdir -p $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware
 	rm -rf $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/*
 	
-	svn export --force $(FIRMWARE_RELEASE_DIR_PATH)/ $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/	
+	svn $(SVN_CREDENTIALS) export --force $(FIRMWARE_RELEASE_DIR_PATH)/ $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/	
 	
-	svn export --force $(AES_CRYPT_SOURCE_PATH) $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/AESCrypt
-	svn export --force $(FIRMWARE_ENCRYPT_DECRYPT_PATH) $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/FirmwareEncryption
+	svn $(SVN_CREDENTIALS) export --force $(AES_CRYPT_SOURCE_PATH) $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/AESCrypt
+	svn $(SVN_CREDENTIALS) export --force $(FIRMWARE_ENCRYPT_DECRYPT_PATH) $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/FirmwareEncryption
 	cd $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/FirmwareEncryption && make all KEY_FLAG='-DKEY="pfr54mhws8a3dms235g3"' AESCRYPT_LIB_SOURCE_PATH=$(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/AESCrypt
 	$(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/tools/FirmwareEncryption/fwdecrypt $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/COSEC_COGNIFACE_buster_V*R*.zip $(LOCAL_OS_IMAGE_MOUNT_PATH)/firmware/app_firmware_decrypted.zip
 	

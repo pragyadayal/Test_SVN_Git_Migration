@@ -19,7 +19,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting $(ZIP_PACKAGE_NAME) packages Source )
 	if [ ! -d $(ZIP_SOURCE_DIR) ]; then \
-		svn export --force $(ZIP_SOURCE_PACKAGE_PATH)/ $(ZIP_SOURCE_DIR);\
+		svn $(SVN_CREDENTIALS) export --force $(ZIP_SOURCE_PACKAGE_PATH)/ $(ZIP_SOURCE_DIR);\
 	fi;
 		
 	$(call msg, Export $(ZIP_PACKAGE_NAME) complete )

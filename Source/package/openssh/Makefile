@@ -32,7 +32,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting openssh packages Source )
 		if [ ! -d $(OPENSSH_SOURCE_DIR) ]; then \
-		svn export --force $(OPENSSH_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(OPENSSH_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	$(call msg, Export complete )
 
@@ -61,7 +61,10 @@ install:
 	mkdir -p $(MAIN_FILESYSTEM_PATH)/bin
 	mkdir -p $(MAIN_FILESYSTEM_PATH)/sbin
 	mkdir -p $(MAIN_FILESYSTEM_PATH)/usr/libexec
+
+	$(STRIP) --strip-debug --strip-unneeded $(OPENSSH_INSTALL_DIR)/bin/ssh-keygen
 	cp -Rf $(OPENSSH_INSTALL_DIR)/bin/ssh-keygen $(MAIN_FILESYSTEM_PATH)/bin/
+
 	if [ -d $(OPENSSH_INSTALL_DIR)/libexec ]; then \
 		$(STRIP) --strip-debug --strip-unneeded $(OPENSSH_INSTALL_DIR)/libexec/sftp-server ; \
 		cp -Rf $(OPENSSH_INSTALL_DIR)/libexec/sftp-server $(MAIN_FILESYSTEM_PATH)/usr/libexec/; \
@@ -70,6 +73,7 @@ install:
 		cp -Rf $(OPENSSH_INSTALL_DIR)/lib/sftp-server $(MAIN_FILESYSTEM_PATH)/usr/libexec/; \
 	fi; \
 	$(STRIP) --strip-debug --strip-unneeded $(OPENSSH_INSTALL_DIR)/sbin/sshd
+	$(STRIP) --strip-debug --strip-unneeded $(OPENSSH_INSTALL_DIR)/bin/scp
 	cp -Rf $(OPENSSH_INSTALL_DIR)/sbin/sshd $(MAIN_FILESYSTEM_PATH)/sbin/
 	cp -Rf $(OPENSSH_INSTALL_DIR)/bin/scp 	$(MAIN_FILESYSTEM_PATH)/bin/
 	

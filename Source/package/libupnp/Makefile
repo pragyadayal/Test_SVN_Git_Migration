@@ -16,7 +16,7 @@ all: source extract patch build install
 
 source:
 	if [ ! -d $(LIBUPNP_SOURCE_DIR) ]; then \
-		svn export --force $(LIBUPNP_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
+		svn $(SVN_CREDENTIALS) export --force $(LIBUPNP_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
 	fi;
 extract:
 	$(call msg,  Extracting package )

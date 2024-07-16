@@ -25,7 +25,7 @@ source:
 			if [ ! -f $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION)/.stamp_source ]; then \
 				mkdir -p $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION); \
 				$(COPY) $(BUILDROOT_PACKAGE_SOURCE)/* $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION)/; \
-				svn export --force $(BUILDROOT_DL_SOURCE) $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION)/dl; \
+				svn $(SVN_CREDENTIALS) export --force $(BUILDROOT_DL_SOURCE) $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION)/dl; \
 				touch $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION)/.stamp_source; \
 			fi ;\
 			for i in $(BUILDROOT_PACKAGE_SOURDCE_DEPENDED_PACKAGE_LIST); \
@@ -34,8 +34,11 @@ source:
 			done ;\
 		else \
 			if [ ! -f $(PLATFORM_ROOTFS_BUILD_PATH)/.tmp ]; then \
-				svn export --force $(BUILDROOT_PACKAGE_SOURCE) $(PLATFORM_ROOTFS_BUILD_PATH); \
-				svn export --force $(BUILDROOT_DL_SOURCE) $(PLATFORM_ROOTFS_BUILD_PATH)/dl; \
+				svn $(SVN_CREDENTIALS) export --force $(BUILDROOT_PACKAGE_SOURCE) $(PLATFORM_ROOTFS_BUILD_PATH); \
+				svn $(SVN_CREDENTIALS) export --force $(BUILDROOT_DL_SOURCE) $(PLATFORM_ROOTFS_BUILD_PATH)/dl; \
+				if [ $(ROOTFS_BOARD_TYPE) == NVRX_RK3588 ]; then \
+					cp -rf $(LOCAL_SDK_PATH)/$(SDK_EXTERNAL_PACKAGE) $(PLATFORM_ROOTFS_BUILD_PATH); \
+				fi; \
 			fi ;\
 		fi ;\
 	fi
@@ -53,6 +56,9 @@ extract:
 			if [ ! -f $(PLATFORM_ROOTFS_BUILD_PATH)/.tmp ]; then \
 			tar -xvf $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_PACKAGE) -C $(PLATFORM_ROOTFS_BUILD_PATH); \
 			mv  $(PLATFORM_ROOTFS_BUILD_PATH)/dl $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION)/dl; \
+			if [ $(ROOTFS_BOARD_TYPE) == NVRX_RK3588 ]; then \
+				tar -xvf $(LOCAL_SDK_PATH)/$(SDK_EXTERNAL_PACKAGE) -C $(PLATFORM_ROOTFS_BUILD_PATH); \
+			fi; \
 			touch $(PLATFORM_ROOTFS_BUILD_PATH)/.tmp; \
 			fi ;\
 		fi ;\
@@ -135,6 +141,7 @@ build:
 		if [ $(BOARD_TYPE) == SSTAR_IPC_5MP_8MP ] || [ $(BOARD_TYPE) == SSTAR_IPC_2MP ]; then \
 			$(MAKE) -C $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION) all BOARD_TYPE=$(BOARD_TYPE); \
 		else \
+			export PATH=$$PATH:$(TOOLCHAIN_PATH)/bin/; \
 			$(MAKE) -C $(PLATFORM_ROOTFS_BUILD_PATH)/$(BUILDROOT_VERSION) all; \
 		fi \
 	fi
@@ -144,8 +151,10 @@ build:
 	fi
 
 	#copy the u-boot env binary to rootfs
-	cp -rf $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools/env/fw_printenv $(ROOTFS_OUTPUT_TARGET_PATH)/usr/sbin/fw_printenv
-	cp -rf $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools/env/fw_printenv $(ROOTFS_OUTPUT_TARGET_PATH)/usr/sbin/fw_setenv
+	if [ $(ROOTFS_BOARD_TYPE) != NVRX_RK3588 ]; then \
+		cp -rf $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools/env/fw_printenv $(ROOTFS_OUTPUT_TARGET_PATH)/usr/sbin/fw_printenv; \
+		cp -rf $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools/env/fw_printenv $(ROOTFS_OUTPUT_TARGET_PATH)/usr/sbin/fw_setenv; \
+	fi
 	
 	$(call msg,   Rootfs Build Success )
 	
@@ -162,7 +171,7 @@ prepare_rootfs:
 	mkdir -p $(PLATFORM_BUILD_PATH)/app_firmware	
 	
 	@if [ $(ROOTFS_BOARD_TYPE) == ARGO_FR ]; then \
-	svn export --force $(FIRMWARE_RELEASE_DIR_PATH)/$(BOARD_NAME)_$(PRODUCT_VER_REV).zip $(PLATFORM_BUILD_PATH)/app_firmware/app_firmware_new.zip.enc; \
+	svn $(SVN_CREDENTIALS) export --force $(FIRMWARE_RELEASE_DIR_PATH)/$(BOARD_NAME)_$(PRODUCT_VER_REV).zip $(PLATFORM_BUILD_PATH)/app_firmware/app_firmware_new.zip.enc; \
 	cp -f $(PLATFORM_SUPPORTED_BOARD_PATH)/$(BOARD_NAME)/package/uboot/$(SECURE_BOOT_PACKAGE_NAME)/rsa2048pem/enc_dec.key $(PLATFORM_BUILD_PATH)/app_firmware/; \
 	cd $(PLATFORM_BUILD_PATH)/app_firmware && openssl enc -aes-256-cbc -salt -d -in app_firmware_new.zip.enc -out app_firmware_new.zip -pass file:enc_dec.key; \
 	unzip $(PLATFORM_BUILD_PATH)/app_firmware/app_firmware_new.zip -d $(PLATFORM_BUILD_PATH)/app_firmware/temp; \
@@ -175,12 +184,12 @@ prepare_rootfs:
 	rm -rf $(PLATFORM_BUILD_PATH)/app_firmware; \
 	mkdir -p $(PLATFORM_BUILD_PATH)/app_firmware; \
 	mkdir -p $(PLATFORM_BUILD_PATH)/app_firmware/mibs; \
-	svn export --force svn://192.168.100.5/Products/Matrix_IPCamera_Netra5000/SDT/V2/Built_packages/Third_Party_Modules/net-snmp/net-snmp-5.8/1.0/install/R2MP_R5MP_E8MP  $(PLATFORM_BUILD_PATH)/app_firmware/; \
-	svn export --force svn://192.168.100.5/Products/Matrix_IPCamera_Netra5000/SDT/V2/Built_packages/Third_Party_Modules/net-snmp/net-snmp-5.8/1.0/mibs $(PLATFORM_BUILD_PATH)/app_firmware/mibs; \
+	svn $(SVN_CREDENTIALS) export --force svn://192.168.100.5/Products/Matrix_IPCamera_Netra5000/SDT/V2/Built_packages/Third_Party_Modules/net-snmp/net-snmp-5.8/1.0/install/R2MP_R5MP_E8MP  $(PLATFORM_BUILD_PATH)/app_firmware/; \
+	svn $(SVN_CREDENTIALS) export --force svn://192.168.100.5/Products/Matrix_IPCamera_Netra5000/SDT/V2/Built_packages/Third_Party_Modules/net-snmp/net-snmp-5.8/1.0/mibs $(PLATFORM_BUILD_PATH)/app_firmware/mibs; \
 	rm -rf $(PLATFORM_BUILD_PATH)/app_firmware/bin; \
 	rm -rf $(PLATFORM_BUILD_PATH)/app_firmware/include; \
 	rm -rf $(PLATFORM_BUILD_PATH)/app_firmware/share; \
-	svn export --force $(FIRMWARE_RELEASE_DIR_PATH) $(PLATFORM_BUILD_PATH)/app_firmware/; \
+	svn $(SVN_CREDENTIALS) export --force $(FIRMWARE_RELEASE_DIR_PATH) $(PLATFORM_BUILD_PATH)/app_firmware/; \
 	cp -rf $(PLATFORM_BUILD_PATH)/app_firmware/* $(ROOTFS_OUTPUT_TARGET_PATH); \
 	echo $(PRODUCT_VER_REV_PATCH) >  $(ROOTFS_OUTPUT_TARGET_PATH)/etc/PlatformVersionRevision; \
 	echo $(KERNEL_VER_SIGNATURE) > $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/kernel/kernel_ver; \

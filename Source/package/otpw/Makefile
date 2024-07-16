@@ -40,9 +40,9 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting otpw packages Source )
 	if [ ! -d $(OTPW_SOURCE_DIR) ]; then \
-		svn export --force $(OTPW_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
-		svn export --force $(AESCRYPT_SOURCE_PACKAGE_PATH)	$(AESCRYPT_SOURCE_DIR);\
-		svn export --force $(MATRIX_EMBEDDED_SOFTWARE_MODULE)/Secure_Remote_Login/Linux-PAM-1.3.1.tar.xz $(LOCAL_PACKAGES_BUILD_PATH); \
+		svn $(SVN_CREDENTIALS) export --force $(OTPW_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
+		svn $(SVN_CREDENTIALS) export --force $(AESCRYPT_SOURCE_PACKAGE_PATH)	$(AESCRYPT_SOURCE_DIR);\
+		svn $(SVN_CREDENTIALS) export --force $(MATRIX_EMBEDDED_SOFTWARE_MODULE)/Secure_Remote_Login/Linux-PAM-1.3.1.tar.xz $(LOCAL_PACKAGES_BUILD_PATH); \
 	fi
 	$(call msg, Export complete )
 

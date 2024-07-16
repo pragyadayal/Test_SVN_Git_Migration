@@ -4,7 +4,7 @@ WPA_SUPPLICANT_PACKAGE_NAME_WITH_EXT=$(WPA_SUPPLICANT_PACKAGE_NAME).tar.gz
 all: source extract matrix_patch build install
 
 source:
-	svn update $(WPA_SUPPLICANT_PACKAGE_NAME_WITH_EXT)
+	svn $(SVN_CREDENTIALS) update $(WPA_SUPPLICANT_PACKAGE_NAME_WITH_EXT)
 
 extract:
 	$(call msg,  Extracting package )

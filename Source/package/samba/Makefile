@@ -82,7 +82,7 @@ all: source extract patch configure build install
 source:
 	$(call msg, Start Exporting $(SAMBA_PACKAGE_NAME) packages Source )
 	if [ ! -d $(SAMBA_SOURCE_DIR) ]; then \
-		svn export --force $(SAMBA_SOURCE_PACKAGE_PATH) $(SAMB_BUILD_PATH)/;\
+		svn $(SVN_CREDENTIALS) export --force $(SAMBA_SOURCE_PACKAGE_PATH) $(SAMB_BUILD_PATH)/;\
 	fi;
 		
 	$(call msg, Export $(SAMBA_PACKAGE_NAME) complete )

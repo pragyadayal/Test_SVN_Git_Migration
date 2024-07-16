@@ -60,7 +60,7 @@ endif
 CFLAGS += -I$(LOCAL_OPEN_ISNS_PACKAGE_PATH)/install/include
 LDFLAGS += -L $(LOCAL_OPEN_ISNS_PACKAGE_PATH)/install/lib 
 
-LDFLAGS +=-L $(BUILDROOT_LIB_PATH)/usr/lib -lkmod
+LDFLAGS += -lkmod
 
 PROGRAMS = iscsid iscsiadm iscsistart
 

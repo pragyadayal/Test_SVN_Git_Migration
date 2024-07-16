@@ -19,7 +19,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting $(UNZIP60_PACKAGE_NAME) packages Source )
 	if [ ! -d $(UNZIP60_SOURCE_DIR) ]; then \
-		svn export --force $(MATRIX_EMBEDDED_SOFTWARE_MODULE)/$(UNZIP60_PACKAGE_FOLDER_NAME) $(UNZIP60_SOURCE_DIR);\
+		svn $(SVN_CREDENTIALS) export --force $(MATRIX_EMBEDDED_SOFTWARE_MODULE)/$(UNZIP60_PACKAGE_FOLDER_NAME) $(UNZIP60_SOURCE_DIR);\
 	fi;
 		
 	$(call msg, Export $(UNZIP60_PACKAGE_NAME) complete )

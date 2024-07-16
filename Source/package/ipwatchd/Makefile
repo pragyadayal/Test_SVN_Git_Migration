@@ -20,7 +20,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting $(IPWATCHD_PACKAGE_NAME) packages Source )
 	if [ ! -d $(IPWATCHD_SOURCE_DIR) ]; then \
-		svn export --force $(IPWATCHD_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH)/;\
+		svn $(SVN_CREDENTIALS) export --force $(IPWATCHD_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH)/;\
 	fi;
 		
 	$(call msg, Export $(IPWATCHD_PACKAGE_NAME) complete )

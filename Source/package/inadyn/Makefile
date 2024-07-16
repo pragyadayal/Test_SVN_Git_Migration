@@ -22,7 +22,7 @@ all: source extract patch build install
 
 source:
 	if [ ! -d $(INADYN_SOURCE_DIR) ]; then \
-		svn export --force $(INADYN_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
+		svn $(SVN_CREDENTIALS) export --force $(INADYN_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
 	fi;
 	
 extract:

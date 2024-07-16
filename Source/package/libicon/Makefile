@@ -15,7 +15,7 @@ all: source extract patch configure build install
 
 source:
 	if [ ! -d $(LIBICONV_SOURCE_DIR) ]; then \
-		svn export --force $(LIBICONV_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
+		svn $(SVN_CREDENTIALS) export --force $(LIBICONV_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH); \
 	fi;
 extract:
 	$(call msg,  Extracting package )

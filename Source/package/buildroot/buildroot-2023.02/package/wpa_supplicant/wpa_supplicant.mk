@@ -15,7 +15,6 @@ WPA_SUPPLICANT_DBUS_SERVICE = fi.w1.wpa_supplicant1
 WPA_SUPPLICANT_CFLAGS = $(TARGET_CFLAGS) -I$(STAGING_DIR)/usr/include/libnl3/
 WPA_SUPPLICANT_SELINUX_MODULES = networkmanager
 
-$(shell cp -f $(TOPDIR)/package/wpa_supplicant/if_macsec.h $(TOPDIR)/output/staging/usr/include/linux)
 
 # install the wpa_client library
 WPA_SUPPLICANT_INSTALL_STAGING = YES
@@ -33,6 +32,10 @@ ifneq ($(BOARD_TYPE), SSTAR_IPC_2MP)
 ifneq ($(BOARD_TYPE), SSTAR_IPC_5MP_8MP)
 $(error Please pass a valid board type e.g. BOARD_TYPE=SSTAR_IPC_2MP or BOARD_TYPE=SSTAR_IPC_5MP_8MP)
 endif
+endif
+
+ifeq ($(BOARD_TYPE), SSTAR_IPC_2MP)
+$(shell cp -f $(TOPDIR)/package/wpa_supplicant/if_macsec.h /opt/arm-buildroot-linux-uclibcgnueabihf-4.9.4-uclibc-1.0.31/arm-buildroot-linux-uclibcgnueabihf/sysroot/usr/include/linux)
 endif
 
 # libnl-3 needs -lm (for rint) and -lpthread if linking statically

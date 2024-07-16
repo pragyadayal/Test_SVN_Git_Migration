@@ -30,18 +30,18 @@ source:
 	# Libraries for csv2xls utility
 	# (1) xlslib
 	if [ ! -d $(XLSLIB_SOURCE_DIR) ]; then \
-		svn export --force $(UTILS_PACKAGE_DIR)/$(XLSLIB_PACKAGE_NAME_WITH_EXT) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(UTILS_PACKAGE_DIR)/$(XLSLIB_PACKAGE_NAME_WITH_EXT) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	
 	# (2) libcsv
 	
 	if [ ! -d $(LIBCSV_SOURCE_DIR) ]; then \
-		svn export --force $(LIBCSV_PACKAGE_DIR) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(LIBCSV_PACKAGE_DIR) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	
 	# (3) csv2xls
 	if [ ! -d $(CSV2XLS_SOURCE_DIR) ]; then \
-		svn export --force $(UTILS_PACKAGE_DIR)/$(CSV2XLS_PACKAGE_NAME_WITH_EXT) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(UTILS_PACKAGE_DIR)/$(CSV2XLS_PACKAGE_NAME_WITH_EXT) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	$(call msg, Export complete )
 

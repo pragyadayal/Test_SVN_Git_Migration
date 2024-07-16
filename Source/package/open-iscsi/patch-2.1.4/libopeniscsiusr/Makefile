@@ -50,8 +50,6 @@ CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
 
 #LDFLAGS += $(shell $(PKG_CONFIG) --libs libkmod)
 
-LDFLAGS +=-L /opt/rk3568_nvr/host/aarch64-buildroot-linux-gnu/sysroot/usr/lib
-
 LIBADD = -lkmod
 
 all: $(LIBS) $(LIBS_MAJOR) $(TESTS) doc

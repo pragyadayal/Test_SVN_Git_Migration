@@ -19,7 +19,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting ble packages Source )
 	$(shell if [ ! -d "$(PLATFORM_BLE_BUILD_PATH)" ]; then mkdir -p $(PLATFORM_BLE_BUILD_PATH); fi ;)
-	svn export --force $(BLE_PACKAGE_SOURCE) $(PLATFORM_BLE_BUILD_PATH)
+	svn $(SVN_CREDENTIALS) export --force $(BLE_PACKAGE_SOURCE) $(PLATFORM_BLE_BUILD_PATH)
 	$(call msg, Export complete )
 	
 extract:

@@ -15,60 +15,49 @@ SHELL	=	/bin/bash
 INSTALL =	cp
 
 #board specific source in board/board_name directory
-BOARD_NAME		= NVR_RK3568
-PRODUCT_VERSION		:= 8
-PRODUCT_REVISION	:= 5
-PRODUCT_PATCH		:= 0
-PLATFORM_SW_VER=$(PRODUCT_VERSION).$(PRODUCT_REVISION).$(PRODUCT_PATCH)
-APP_VERSION=V08R05
-KERNEL_UPGRADE_VER = 3
+BOARD_NAME			=	NVR_RK3568
+PRODUCT_VERSION		=	V08
+PRODUCT_REVISION	=	R06.03
+PRODUCT_VER_REV		=	$(PRODUCT_VERSION)$(PRODUCT_REVISION)
+PLATFORM_SW_VER		=	8.7.0
+KERNEL_UPGRADE_VER	=	4
 
+#change this tag as per requirement
+RELEASE_TYPE		= PRODUCTION
+
+#----------------------------------Release type---------------------------------
+# TRUNK			: Build from Trunk
+# DEVELOPMENT	: Development purpose
+# QA			: QA Release 
+# PRODUCTION	: Producation Release 
+SUPPORTED_RELEASE_TYPE = TRUNK DEVELOPMENT QA PRODUCTION
 
 #Secureboot enable or disable configurations (value = ENABLE or DISABLE)
 SECUREBOOT_EN		?= DISABLE
 
 SVN_SERVER=svn://192.168.100.5
 
-################################################################################################
+###################################### Platform Path #########################################################
 
-TRUNK			= Trunk
-BRANCHES		= Branches
-#----------------------------------Release type---------------------------------
-#DEVELOPMENT =  use this tag for development purpose
-#QA = use this tag for QA Release 
-#MANU - use this tag for producation release 
-#----------------------------------Release type---------------------------------
-SUPPORTED_RELEASE_TYPE = DEVELOPMENT QA MANU
+TRUNK				= $(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Trunk
+DEVELOPMENT_BRANCH	= $(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Branches/Development/$(BOARD_NAME)/$(PLATFORM_SW_VER)
+RELEASE_BRANCH		= $(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Branches/Releases/$(BOARD_NAME)/$(PLATFORM_SW_VER)
 
-#change this tag as per requirement
-#varialbe should be pass from command line (Jenkins)
-RELEASE_TYPE		= DEVELOPMENT
-
-
-DEVELOPMENT_BRANCH	= $(BRANCHES)/Development/$(BOARD_NAME)
-QA_RELEASE_BRANCH	= $(BRANCHES)/Development
-PRODUCTION_BRANCH	= $(TRUNK)
-
+# directory of generic platfrom source
 ifeq ($(filter $(SUPPORTED_RELEASE_TYPE),$(RELEASE_TYPE)),)
-
 $(info Supported release are $(SUPPORTED_RELEASE_TYPE))
 $(error Please pass a valid release type)
+else ifeq ($(RELEASE_TYPE),TRUNK)
+GENERIC_PLATFORM_PATH	= $(TRUNK)
+else ifeq ($(RELEASE_TYPE),DEVELOPMENT)
+GENERIC_PLATFORM_PATH	= $(DEVELOPMENT_BRANCH)
+else ifeq ($(RELEASE_TYPE),QA)
+GENERIC_PLATFORM_PATH	= $(DEVELOPMENT_BRANCH)
+else ifeq ($(RELEASE_TYPE),PRODUCTION)
+GENERIC_PLATFORM_PATH	= $(RELEASE_BRANCH)
 endif
-
-ifeq ($(RELEASE_TYPE),DEVELOPMENT)
-TAG		= $(DEVELOPMENT_BRANCH)
-endif
-
-ifeq ($(RELEASE_TYPE),QA)
-TAG		= $(QA_RELEASE_BRANCH)
-endif
-ifeq ($(RELEASE_TYPE),MANU)
-TAG		= $(PRODUCTION_BRANCH)
-endif
-
 
 ################################################################################################
-
 
 #directory of all Matrix Briefcase 
 MATRIX_SWD_BRIEFCASE=$(SVN_HOME_DIR)/Briefcase/SWD_Briefcase
@@ -80,9 +69,6 @@ MATRIX_EMBEDDED_SOFTWARE_MODULE=$(SVN_SERVER)/Briefcase/SWD_Briefcase/EmbeddedSo
 
 #directory of all Matrix Briefcase 
 MATRIX_SECURITY_DOMAIN_SOFTWARE_MODULE=$(MATRIX_SWD_BRIEFCASE)/Security
-
-# directory of generic platfrom source
-GENERIC_PLATFORM_PATH=$(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Branches/Releases/NVR_RK3568/8.5.0
 
 # platform source directory structure
 PLATFORM_SOURCE_PATH=$(GENERIC_PLATFORM_PATH)/Source
@@ -110,6 +96,7 @@ SDK_VERSION=rk356x_linux_release_v1.3.0_20220122
 #NOTE: buildroot package is used from the rk356x_nvr_linux_full.tar.gz. reason to avoid the package vesion conflit 
 #sdk package source name 
 SDK_PACKAGE_NAME=rk356x_nvr_lite_1.3.0_20220122.tar.gz
+SDK_FULL_PACKAGE_NAME=rk356x_nvr_linux_full.tar.gz
 
 #rockchip SVN SDK path
 SVN_RK3568_SDK_PATH=$(SVN_SERVER)/Briefcase/SWD_Briefcase/Security/RDK/$(SOC_VENDOR_NAME)/$(SOC_NAME)
@@ -176,8 +163,8 @@ ROOTFS_OUTPUT_TARGET_PATH=$(BUILDROOT_OUTPUT_PATH)/target
 
 MAIN_FILESYSTEM_PATH=$(ROOTFS_OUTPUT_TARGET_PATH)
 
-# LOCAL_PLATFORM_UPGRADE_DIR_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/platform_upgrade_zip
-# PLATFORM_UPGRADE_FILE=platform_upgrade.zip
+LOCAL_PLATFORM_UPGRADE_DIR_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/platform_upgrade_zip
+PLATFORM_UPGRADE_FILE=platform_upgrade.zip
 # FIRMWARE_ZIP_FILE=NVR1602X_32X_64X_firmware_V07R10.zip
 
 
@@ -211,8 +198,7 @@ KERNEL_UPGRADE_VER_FILE_NAME=kernel_ver
 
 ###########################  Application firmware path ##############################################
 
-#TODO update path and version revision
-#FIRMWARE_RELEASE_DIR_PATH ?=$(SVN_SERVER)/Products/SATATYA_DEVICES/SDT/Software_Releases/VideoRecorder/Production/V07R10/HI3536_NVRH/web/
+FIRMWARE_RELEASE_DIR_PATH=$(SVN_SERVER)/Products/SATATYA_DEVICES/SDT/Software_Releases/VideoRecorder/Production/$(PRODUCT_VER_REV)/RK3568_NVRL/web
 #APPLICATION_VER_REV ?=V07R10
 #PPLICATION_FIRMWARE_NAME ?=NVR1602X_32X_64X_firmware_$(APPLICATION_VER_REV)
 #APPLICATION_FIRMWARE_ZIP ?=$(APPLICATION_FIRMWARE_NAME).zip
@@ -336,7 +322,7 @@ USBUPGRADE_OUTPUT_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/usbupgrade
 ################################## USB upgrade Path##################################################
 TOOLS_PATH=$(PLATFORM_SOURCE_PATH)/tools
 SDK_UPDATE_IMAGES_PATH=$(PLATFORM_SUPPORTED_BOARD_PATH)/$(BOARD_NAME)/package/production_release/sdk_update/image
-PRODUCTION_ZIP_NAME=NVR_8X_16X_P2_kernel_fs_$(APP_VERSION).zip
+PRODUCTION_ZIP_NAME=NVR_8X_16X_P2_kernel_fs_$(PRODUCT_VER_REV).zip
 
 ################################## SDK Tool path and GPT creation path ##################################################
 PARTITION_TXT_FILE_PATH=$(TOOLS_PATH)/$(BOARD_NAME)/partition_table/matrix_parameter-buildroot-fit.txt

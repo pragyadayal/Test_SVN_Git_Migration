@@ -10,7 +10,7 @@ endif
 #define Production bin generated path
 TARGET_DIR_NAME=$(PLATFORM_SW_VER)/target/$(BOARD_NAME)$(BOARD_VARIANT)
 
-HEX_FILE_NAME=RK3568_NVRL_eMMC_$(APP_VERSION).bin
+HEX_FILE_NAME=RK3568_NVRL_eMMC_$(PLATFORM_SW_VER).bin
 
 PRODUCTION_RELEASE_PATH=$(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/Software_Releases/$(BOARD_NAME)
 MINILOADER_IMAGE_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/$(UBOOT_SPL_IMAGE_NAME)
@@ -46,7 +46,7 @@ USB_SCRIPT_IMG_FILE=$(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupg
 
 all: matrix_fs copy_content resourceImg usbbootscript generate_zip genProdBin
 
-matrix_fs:extra_lib matrix_patch  build_fs install platform_upgrade_zip
+matrix_fs:extra_lib matrix_patch build_fs install platform_upgrade_zip
 
 matrix_patch:
 
@@ -115,26 +115,30 @@ install:
 	
 platform_upgrade_zip:
 
-# 	$(call msg, Generate Platform_upgrade_zip)
-# 
-# 	$(call msg,  Remove previously created platform upgrade directory and zip   )
-# 	rm -rf $(PLATFORM_UPGRADE_FILE)
-# 
-# 	$(call msg,Create new directoy if not created)
-# 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
-# 
-# 	$(call msg,Create required directory in ZIP directory)
-# 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/bin
-# 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/etc
-# 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix
-# 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/usr
-# 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/sbin
-# 	
-# 	cd $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/ && zip -r -y -q -9 $(PLATFORM_UPGRADE_FILE) bin etc matrix usr sbin
-# 	mv $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE) $(PLATFROM_BUILD_OUTPUT_PATH)
-# 	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
+	$(call msg, Generate platform_upgrade.zip)
+
+	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE)
+
+	# create required directories
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/bin
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/etc
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/usr
+	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/sbin
+
+	# copying files
+	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/kernel $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/kernel
+	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/ko $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/ko
+
+	# deleting empty directories
+	find $(LOCAL_PLATFORM_UPGRADE_DIR_PATH) -type d -empty -delete
 	
-	$(call msg,Platform_upgrade_zip ZIP is generated)
+	cd $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/ && zip -r -y -q -9 $(PLATFORM_UPGRADE_FILE) bin etc matrix usr sbin
+	mv $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE) $(PLATFROM_BUILD_OUTPUT_PATH)
+	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
+	
+	$(call msg,platform_upgrade_zip ZIP is generated)
 
 genProdBin:
 
@@ -179,12 +183,7 @@ genProdBin:
 	
 	$(call msg, Generate hex for $(BOARD_VARIANT) production done)
 	
-	@echo -e "\033[91m"
-	@echo "========================================================================================================================================"
-	@echo " 						Please commit Production hex bin at PATH:"
-	@echo "    $(PRODUCTION_HEX_PATH)"
-	@echo "========================================================================================================================================"
-	@echo -e "\033[0m"
+	$(call msg, Please commit Production hex bin at PATH:\n    $(PRODUCTION_HEX_PATH))
 	
 copy_content:
 
@@ -203,12 +202,7 @@ copy_content:
 	
 	$(call msg,  Production release done )
 	
-	@echo -e "\033[91m"
-	@echo "========================================================================================================================================"
-	@echo " 						Please commit all binary for Production release at PATH:"
-	@echo "    $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME) )"
-	@echo "========================================================================================================================================"
-	@echo -e "\033[0m"
+	$(call msg, Please commit all binary for Production release at PATH:\n    $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME))
 
 usbbootscript:
 
@@ -246,28 +240,16 @@ usbbootscript:
 	#mkimage -T script -C none -n 'flashing' -d $(USB_SCRIT_SOURCE_FILE) $(USB_SCRIPT_IMG_FILE)
 	$(MKIMAGE_TOOL_PATH)/mkimage -A arm -O U-Boot -C none -T script -d $(USB_SCRIT_SOURCE_FILE) $(USB_SCRIPT_IMG_FILE)
 	
-	@echo -e "\033[91m"
-	@echo "======================================================================"
-	@echo "    USB SCRIPT generated successfully				     "
-	@echo "======================================================================"
-	@echo -e "\033[0m"
+	$(call msg, USB SCRIPT generated successfully)
 	
 	rm -rf $(USB_SCRIT_SOURCE_FILE)
 	#rm -rf $(USB_SCRIPT_IMG_FILE)
 	
-	@echo -e "\033[91m"
-	@echo "#######################################################################"
-	@echo " $(BOARD_TYPE)_usbupgrade.img generated in target Dir!! 	      "
-	@echo "#######################################################################"
-	@echo -e "\033[0m"
+	$(call msg, $(BOARD_TYPE)_usbupgrade.img generated in target Dir!!)
 	
 generate_zip:
 	
-	@echo -e "\033[91m"
-	@echo "#######################################################################"
-	@echo "#		Generating  USB Upgrade zip started		      "
-	@echo "#######################################################################"
-	@echo -e "\033[0m"
+	$(call msg, Generating  USB Upgrade zip started)
 	
 	#cp $(SDK_UPDATE_IMAGES_PATH)/* $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
 	
@@ -286,19 +268,11 @@ generate_zip:
 	mv $(USBUPGRADE_OUTPUT_PATH)/$(PRODUCTION_ZIP_NAME) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
 	rm -rf $(USBUPGRADE_OUTPUT_PATH)
 	
-	@echo -e "\033[91m"
-	@echo "#######################################################################"
-	@echo "#		Generating  USB Upgrade zip successfully	      "
-	@echo "#######################################################################"
-	@echo -e "\033[0m"
+	$(call msg, Generating  USB Upgrade zip successfully)
 
 resourceImg:
 	
-	@echo -e "\033[91m"
-	@echo "#######################################################################"
-	@echo "#		Generating Resource image		      "
-	@echo "#######################################################################"
-	@echo -e "\033[0m"
+	$(call msg, Generating Resource image)
 	
 	#rm -rf $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools/images/*
 	#cp $(SDK_UPDATE_IMAGES_PATH)/* $(MKIMAGE_TOOL_PATH)/images/
@@ -306,9 +280,5 @@ resourceImg:
 	#cd $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION) && ./scripts/pack_resource.sh $(LOCAL_KERNEL_BUILD_PATH)/$(KERNEL_VERSION)/resource.img
 	
 	cp -rf  $(LOCAL_KERNEL_BUILD_PATH)/$(KERNEL_VERSION)/resource.img  $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(RESOURCE_IMG_NAME)
-	@echo -e "\033[91m"
-	@echo "#######################################################################"
-	@echo "#		Generating Resource successfully	      "
-	@echo "#######################################################################"
-	@echo -e "\033[0m"
+	$(call msg, Generating Resource successfully)
 	

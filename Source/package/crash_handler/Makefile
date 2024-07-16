@@ -18,7 +18,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting crash_handler package Source )
 	if [ ! -d $(CRASHHANDLER_SOURCE_DIR) ]; then \
-		svn export --force $(CRASHHANDLER_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(CRASHHANDLER_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 		tar -xvf $(LOCAL_PACKAGES_BUILD_PATH)/$(CRASHHANDLER_PACKAGE_NAME_WITH_EXT) -C $(LOCAL_PACKAGES_BUILD_PATH);  \
 	fi;
 		
@@ -29,7 +29,7 @@ source:
 extract:
 	$(call msg,  Extracting package )
 	tar -xvf $(LOCAL_PACKAGES_BUILD_PATH)/$(CRASHHANDLER_PACKAGE_NAME_WITH_EXT) -C $(LOCAL_PACKAGES_BUILD_PATH);
-	svn export --force $(CRASHHANDLER_PATCH_PATH) $(CRASHHANDLER_SOURCE_DIR)
+	svn $(SVN_CREDENTIALS) export --force $(CRASHHANDLER_PATCH_PATH) $(CRASHHANDLER_SOURCE_DIR)
 	$(call msg,  Extract complete )
 
 patch:

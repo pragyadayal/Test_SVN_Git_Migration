@@ -16,7 +16,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting curl packages Source )
 	if [ ! -d $(CRASHHANDLER_SOURCE_DIR) ]; then \
-		svn export --force $(CRASHHANDLER_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(CRASHHANDLER_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 		tar -xvf $(LOCAL_PACKAGES_BUILD_PATH)/$(CRASHHANDLER_PACKAGE_NAME_WITH_EXT) -C $(LOCAL_PACKAGES_BUILD_PATH);  \
 	fi;
 		

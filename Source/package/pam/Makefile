@@ -16,7 +16,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting libpam packages Source )
 		if [ ! -d $(PAM_SOURCE_DIR) ]; then \
-		svn export --force $(PAM_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(PAM_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	$(call msg, Export complete )
 

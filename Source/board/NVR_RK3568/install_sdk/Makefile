@@ -5,14 +5,13 @@ else
 include $(PATH_VARIABLE_FILE)
 endif
 
-all: patch
-
+all: source extract patch install
 
 source:
 	$(call msg,  Checking Out SDK )
 	@if [ ! -f $(SDK_SOURCE_PATH)/.stamp_source ]; then \
-	svn --force export $(SVN_RK3568_SDK_PATH)/$(SDK_VERSION)/patch $(SDK_SOURCE_PATH)/patch; \
-	svn --force export $(SVN_RK3568_SDK_PATH)/$(SDK_VERSION)/$(SDK_PACKAGE_NAME)  $(SDK_SOURCE_PATH)/; \
+	rm -rf $(SDK_SOURCE_PATH)/; \
+	svn --force export $(SVN_RK3568_SDK_PATH)/$(SDK_VERSION) $(SDK_SOURCE_PATH)/; \
 	touch $(SDK_SOURCE_PATH)/.stamp_source ; \
 	fi
 	
@@ -22,15 +21,15 @@ extract:
 
 	$(call msg,  SDK Extract start )
 	@if [ ! -f $(SDK_SOURCE_PATH)/.stamp_extract ]; then \
-	tar -xvf $(SDK_SOURCE_PATH)/$(SDK_PACKAGE_NAME) -C $(SDK_SOURCE_PATH)/ ; \
-	cd $(LOCAL_SDK_PATH) && chmod 777 ./build_emmc.sh ; \
-	cd $(LOCAL_SDK_PATH) && ./build_emmc.sh env ; \	
+	tar -xvf $(SDK_SOURCE_PATH)/$(SDK_PACKAGE_NAME) --exclude="*/.repo" -C $(SDK_SOURCE_PATH)/ ; \
+	cd $(LOCAL_SDK_PATH) && chmod 777 ./build_emmc.sh && ./build_emmc.sh env ; \
 	touch $(SDK_SOURCE_PATH)/.stamp_extract ; \
 	fi
 	$(call msg,  SDK Extract complete )
-	
-all:
 
+	#tar -xvf $(SDK_SOURCE_PATH)/$(SDK_FULL_PACKAGE_NAME) --exclude="*/.repo/*" -C $(SDK_SOURCE_PATH)/ ; \
+
+patch:
 	$(call msg,  SDK patch start )
 	
 	@if [ ! -f $(SDK_SOURCE_PATH)/.stamp_patch ]; then \
@@ -49,12 +48,21 @@ all:
 	cd $(EXTRA_APPL_DEP_LIBRARY_PATH)/ && cp -drf deps/lib/librockchip_mpp.so.1		$(EXTRA_TOOL_CHAIN_LIBRARY_PATH)/librockchip_mpp.so.0; \
 	cd $(EXTRA_APPL_DEP_LIBRARY_PATH)/ && cp -drf deps/lib/libswresample.so.3		$(EXTRA_TOOL_CHAIN_LIBRARY_PATH); \
 	# libmali.so copied from $(SDK_MATRIX_PATCH_PATH) \
-	mkdir -p $(TOOLCHAIN_INSTALL_PATH); \
-	cp -rf $(LOCAL_SDK_PATH)/build/toolchain $(TOOLCHAIN_INSTALL_PATH)/; \
 	touch $(SDK_SOURCE_PATH)/.stamp_patch ; \
 	fi
 	
 	$(call msg,  SDK patch complete )
+
+install:
+	$(call msg,  Toolchain Installation Start )
+
+	@if [ ! -d $(TOOLCHAIN_INSTALL_PATH) ]; then \
+	mkdir -p $(TOOLCHAIN_INSTALL_PATH); \
+	cp -rf $(LOCAL_SDK_PATH)/build/toolchain $(TOOLCHAIN_INSTALL_PATH)/; \
+	touch $(SDK_SOURCE_PATH)/.stamp_patch ; \
+	fi
+
+	$(call msg,  Toolchain Installation Complete )
 
 clean-sdk:
 	rm -rf $(SDK_SOURCE_PATH)

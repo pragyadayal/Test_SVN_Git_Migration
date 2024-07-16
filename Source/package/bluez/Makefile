@@ -17,7 +17,7 @@ all: source extract patch build install
 source:
 	$(call msg, Start Exporting bluez packages Source )
 	if [ ! -d $(BLUEZ_SOURCE_DIR) ]; then \
-		svn export --force $(BLUEZ_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(BLUEZ_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 		
 	$(call msg, Export complete )

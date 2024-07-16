@@ -10,13 +10,14 @@ OPENSSL_PACKAGE_NAME_WITH_EXT=$(OPENSSL_PACKAGE_NAME).tar.gz
 OPENSSL_SOURCE_PACKAGE_PATH=$(MATRIX_EMBEDDED_SOFTWARE_MODULE)/OpenSSL/$(OPENSSL_PACKAGE_NAME_WITH_EXT)
 OPENSSL_SOURCE_DIR := $(LOCAL_PACKAGES_BUILD_PATH)/$(OPENSSL_PACKAGE_NAME)
 OPENSSL_INSTALL_DIR := $(OPENSSL_SOURCE_DIR)/install
+OPENSSL_PATCH_DIR := $(PLATFORM_PACKAGE_PATH)/openssl/opensslPatch
 
 all: source extract patch build install
 
 source:
 	$(call msg, Start Exporting openssl packages Source )
 	if [ ! -d $(OPENSSL_SOURCE_DIR) ]; then \
-		svn export --force $(OPENSSL_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		svn $(SVN_CREDENTIALS) export --force $(OPENSSL_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	$(call msg, Export complete )
 
@@ -30,6 +31,8 @@ extract:
 
 patch:
 	$(call msg,   Applying patch )
+	rsync -a --exclude=".svn" $(OPENSSL_PATCH_DIR)/ $(OPENSSL_SOURCE_DIR)/
+
 	$(call msg,    patch Applied )
 
 build:

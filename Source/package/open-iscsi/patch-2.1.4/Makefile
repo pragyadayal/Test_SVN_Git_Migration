@@ -56,7 +56,7 @@ endif
 # export systemd disablement if set
 ifneq ($(NO_SYSTEMD),)
 export NO_SYSTEMD
-WITHOUT_ARG = --without-systemd --host=aarch64-buildroot-linux LDFLAGS="-L$(BUILDROOT_LIB_PATH)/usr/lib -L$(LOCAL_OPEN_ISNS_PACKAGE_PATH)/install/lib"  LIBS=-lkmod CFLAGS=-I$(LOCAL_OPEN_ISNS_PACKAGE_PATH)/install/include
+WITHOUT_ARG = --without-systemd --host=aarch64-buildroot-linux-gnu LDFLAGS="-L$(LOCAL_OPEN_ISNS_PACKAGE_PATH)/install/lib"  LIBS=-lkmod CFLAGS=-I$(LOCAL_OPEN_ISNS_PACKAGE_PATH)/install/include
 else
 WITHOUT_ARG =
 endif

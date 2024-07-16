@@ -26,8 +26,8 @@ source:
 	$(call msg, Start Exporting packages Source )
 	if [ ! -d $(OPEN_ISCSI_SOURCE_DIR) ]; then \
 		mkdir -p $(LOCAL_PACKAGES_BUILD_PATH)/$(OPEN_ISCSI_PACKAGE_NAME) ; \
-		cd $(LOCAL_PACKAGES_BUILD_PATH)/$(OPEN_ISCSI_PACKAGE_NAME)/ && svn export --force $(OPEN_ISCSI_SOURCE_PACKAGE_PATH) ./ ;\
-		svn export --force $(OPEN_ISNS_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
+		cd $(LOCAL_PACKAGES_BUILD_PATH)/$(OPEN_ISCSI_PACKAGE_NAME)/ && svn $(SVN_CREDENTIALS) export --force $(OPEN_ISCSI_SOURCE_PACKAGE_PATH) ./ ;\
+		svn $(SVN_CREDENTIALS) export --force $(OPEN_ISNS_SOURCE_PACKAGE_PATH) $(LOCAL_PACKAGES_BUILD_PATH);\
 	fi
 	$(call msg, Export complete )
 
