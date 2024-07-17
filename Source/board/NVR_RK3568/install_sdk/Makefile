@@ -22,12 +22,11 @@ extract:
 	$(call msg,  SDK Extract start )
 	@if [ ! -f $(SDK_SOURCE_PATH)/.stamp_extract ]; then \
 	tar -xvf $(SDK_SOURCE_PATH)/$(SDK_PACKAGE_NAME) --exclude="*/.repo" -C $(SDK_SOURCE_PATH)/ ; \
+	tar -xvf $(SDK_SOURCE_PATH)/$(SDK_FULL_PACKAGE_NAME) --exclude-vcs -C $(SDK_SOURCE_PATH)/ rk356x_nvr_linux_full/buildroot; \
 	cd $(LOCAL_SDK_PATH) && chmod 777 ./build_emmc.sh && ./build_emmc.sh env ; \
 	touch $(SDK_SOURCE_PATH)/.stamp_extract ; \
 	fi
 	$(call msg,  SDK Extract complete )
-
-	#tar -xvf $(SDK_SOURCE_PATH)/$(SDK_FULL_PACKAGE_NAME) --exclude="*/.repo/*" -C $(SDK_SOURCE_PATH)/ ; \
 
 patch:
 	$(call msg,  SDK patch start )
