@@ -30,3 +30,40 @@ Build procedure:
 => Guide docs
 
 	"svn://192.168.100.5/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/SWD/Trunk/Study_Reports_Design/secure_booting_secure_firmware.odt"
+
+
+
+RK_ARCH=arm64
+RK_KERNEL_DEFCONFIG_FRAGMENT=rk3568_nvr.config
+PATH_VARIABLE_FILE=/root/platform/source/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/SWD/Branches/Releases/NVR_RK3568/8.7.0/Source/board/NVR_RK3568/Pathvariables.mk
+RK_ROOTFS_TYPE=ext4
+BOARD_TYPE=NVR_RK3568
+MAKEFLAGS=w -- PATH_VARIABLE_FILE=/root/platform/source/Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/SWD/Branches/Releases/NVR_RK3568/8.7.0/Source/board/NVR_RK3568/Pathvariables.mk BOARD_TYPE=NVR_RK3568 PRODUCT_VERSION=V08 PRODUCT_REVISION=R07 BOARD_VARIANT=L
+RK_BASH_ONLY=Only
+RK_UBI_PAGE_SIZE=2048
+RK_ROOTFS_IMG=rootfs.ext4
+BOARD_VARIANT=L
+RK_UBOOT_DEFCONFIG=rk3568
+RK_PARAMETER=parameter-nvr-emmc.txt
+MAKEOVERRIDES=${-*-command-variables-*-}
+LD_LIBRARY_PATH=/root/platform/source/Briefcase/SWD_Briefcase/Security/RDK/Rockchip/RK3568/rk356x_linux_release_v1.3.0_20220122/rk356x_nvr_lite_1.3.0_20220122/build/toolchain/lib
+PRODUCT_VERSION=V08
+RK_BUILD_TOOLCHAIN=/root/platform/source/Briefcase/SWD_Briefcase/Security/RDK/Rockchip/RK3568/rk356x_linux_release_v1.3.0_20220122/rk356x_nvr_lite_1.3.0_20220122/build/toolchain
+MAKE_TERMOUT=/dev/pts/0
+RK_FLASH_TYPE=emmc
+MAKELEVEL=2
+RK_JOBS=12
+MFLAGS=-w
+RK_ROOTFS_PARTITION_SIZE=0xB400000
+RK_BOOT_IMG=zboot.img
+RK_USERDATA_TYPE=ext4
+RK_KERNEL_DTS=rk3568-nvr-demo-v12-linux
+RK_KERNEL_DEFCONFIG=rockchip_linux_defconfig
+PRODUCT_REVISION=R07
+RK_KERNEL_FIT_ITS=boot.its
+RK_PACKAGE_FILE=rk356x-package-file-nvr-emmc
+RK_TARGET_PRODUCT=rk3568
+MAKE_TERMERR=/dev/pts/0
+RK_UBI_BLOCK_SIZE=0x20000
+RK_UBOOT_FORMAT_TYPE=fit
+RK_USERDATA_PARTITION_SIZE=0xB400000

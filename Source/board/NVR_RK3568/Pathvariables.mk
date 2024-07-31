@@ -9,10 +9,10 @@ ARCHIVER		=	$(CROSS_COMPILE)ar
 STRIP			=	$(CROSS_COMPILE)strip
 RANLIB			=	$(CROSS_COMPILE)ranlib
 ARCH			=	arm64
-CC			=/opt/rk3568_nvr/host/bin/aarch64-linux-gcc
+CC				=	/opt/rk3568_nvr/host/bin/aarch64-linux-gcc
 
-SHELL	=	/bin/bash 
-INSTALL =	cp
+SHELL			=	/bin/bash 
+INSTALL 		=	cp
 
 #board specific source in board/board_name directory
 BOARD_NAME			=	NVR_RK3568
@@ -39,9 +39,9 @@ SVN_SERVER=svn://192.168.100.5
 
 ###################################### Platform Path #########################################################
 
-TRUNK				= $(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Trunk
-DEVELOPMENT_BRANCH	= $(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Branches/Development/$(BOARD_NAME)/$(PLATFORM_SW_VER)
-RELEASE_BRANCH		= $(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/SWD/Branches/Releases/$(BOARD_NAME)/$(PLATFORM_SW_VER)
+TRUNK				= $(MATRIX_GENERIC_SW_PLATFORM_PATH)/SWD/Trunk
+DEVELOPMENT_BRANCH	= $(MATRIX_GENERIC_SW_PLATFORM_PATH)/SWD/Branches/Development/$(BOARD_NAME)/$(PLATFORM_SW_VER)
+RELEASE_BRANCH		= $(MATRIX_GENERIC_SW_PLATFORM_PATH)/SWD/Branches/Releases/$(BOARD_NAME)/$(PLATFORM_SW_VER)
 
 # directory of generic platfrom source
 ifeq ($(filter $(SUPPORTED_RELEASE_TYPE),$(RELEASE_TYPE)),)
@@ -60,15 +60,14 @@ endif
 ################################################################################################
 
 #directory of all Matrix Briefcase 
-MATRIX_SWD_BRIEFCASE=$(SVN_HOME_DIR)/Briefcase/SWD_Briefcase
+MATRIX_SWD_BRIEFCASE=Briefcase/SWD_Briefcase
 
 #directory of all Matrix Generic modules is present
-MATRIX_GENERIC_SOFTWARE_MODULE=$(MATRIX_SWD_BRIEFCASE)/GenericSoftwareModules
+MATRIX_GENERIC_SW_PLATFORM_PATH=$(SVN_HOME_DIR)/$(MATRIX_SWD_BRIEFCASE)/GenericSoftwareModules/Platform
 
 MATRIX_EMBEDDED_SOFTWARE_MODULE=$(SVN_SERVER)/Briefcase/SWD_Briefcase/EmbeddedSoftwareModules
 
-#directory of all Matrix Briefcase 
-MATRIX_SECURITY_DOMAIN_SOFTWARE_MODULE=$(MATRIX_SWD_BRIEFCASE)/Security
+SDK_PATH=$(MATRIX_SWD_BRIEFCASE)/Security/RDK/$(SOC_VENDOR_NAME)/$(SOC_NAME)
 
 # platform source directory structure
 PLATFORM_SOURCE_PATH=$(GENERIC_PLATFORM_PATH)/Source
@@ -84,26 +83,23 @@ PLATFORM_PACKAGE_PATH=$(PLATFORM_SOURCE_PATH)/package
 
 ##################################  SDK   ########################################################## 
 
-#SOC_VENDOR name
 SOC_VENDOR_NAME=Rockchip
 
-#SOC name
 SOC_NAME=RK3568
 
-#version information 
 SDK_VERSION=rk356x_linux_release_v1.3.0_20220122
 
 #NOTE: buildroot package is used from the rk356x_nvr_linux_full.tar.gz. reason to avoid the package vesion conflit 
 #sdk package source name 
-SDK_PACKAGE_NAME=rk356x_nvr_lite_1.3.0_20220122.tar.gz
-SDK_FULL_PACKAGE_NAME=rk356x_nvr_linux_full.tar.gz
+SDK_PACKAGE_NAME=rk356x_nvr_lite_1.3.0_20220122
+SDK_FULL_PACKAGE_NAME=rk356x_nvr_linux_full
 
 #rockchip SVN SDK path
-SVN_RK3568_SDK_PATH=$(SVN_SERVER)/Briefcase/SWD_Briefcase/Security/RDK/$(SOC_VENDOR_NAME)/$(SOC_NAME)
+SVN_RK3568_SDK_PATH=$(SVN_SERVER)/$(SDK_PATH)
 
 # directory rockchip package of all sources
-SDK_SOURCE_PATH=$(MATRIX_SECURITY_DOMAIN_SOFTWARE_MODULE)/RDK/$(SOC_VENDOR_NAME)/$(SOC_NAME)/$(SDK_VERSION)
-LOCAL_SDK_PATH=$(MATRIX_SECURITY_DOMAIN_SOFTWARE_MODULE)/RDK/$(SOC_VENDOR_NAME)/$(SOC_NAME)/$(SDK_VERSION)/rk356x_nvr_lite_1.3.0_20220122
+SDK_SOURCE_PATH=$(SVN_HOME_DIR)/$(SDK_PATH)/$(SDK_VERSION)
+LOCAL_SDK_PATH=$(SDK_SOURCE_PATH)/$(SDK_PACKAGE_NAME)
 
 SDK_RKMPI_RELEASE_PACKAGE=RKMPI_Release_V1.5.1_220514
 SDK_RKMPI_RELEASE_PACKAGE_NAME=$(SDK_RKMPI_RELEASE_PACKAGE).tar.gz
@@ -111,7 +107,7 @@ SDK_RKMPI_RELEASE_PACKAGE_NAME=$(SDK_RKMPI_RELEASE_PACKAGE).tar.gz
 SDK_RKMPI_RELEASE_PATCH_PATH=$(SDK_SOURCE_PATH)/patch/$(SDK_RKMPI_RELEASE_PACKAGE)
 
 SDK_INSTALLATION_MAKEFILE_PATH=$(PLATFORM_SUPPORTED_BOARD_PATH)/$(BOARD_NAME)/install_sdk
-SDK_MATRIX_PATCH_PATH=$(SDK_INSTALLATION_MAKEFILE_PATH)/patch/$(SDK_VERSION)/rk356x_nvr_lite_1.3.0_20220122
+SDK_MATRIX_PATCH_PATH=$(SDK_INSTALLATION_MAKEFILE_PATH)/patch/$(SDK_VERSION)/$(SDK_PACKAGE_NAME)
 
 ################################## Build Part  ########################################################## 
 #platfrom run time build directory
@@ -142,7 +138,7 @@ BUILDROOT_PACKAGE=$(BUILDROOT_VERSION).tar.bz2
 #BUILDROOT_PACKAGE_SOURCE=$(MATRIX_EMBEDDED_SOFTWARE_MODULE)/buildroot/$(BUILDROOT_VERSION)/$(BUILDROOT_PACKAGE)
 BUILDROOT_DL_SOURCE=$(MATRIX_EMBEDDED_SOFTWARE_MODULE)/buildroot/$(BUILDROOT_VERSION)/dl
 
-BUILDROOT_PACKAGE_SOURCE=$(SDK_SOURCE_PATH)/rk356x_nvr_linux_full/buildroot
+BUILDROOT_PACKAGE_SOURCE=$(SDK_SOURCE_PATH)/$(SDK_FULL_PACKAGE_NAME)/buildroot
 
 BUILDROOT_PACKAGE_SOURDCE_DEPENDED_PACKAGE_LIST =$(LOCAL_SDK_PATH)/rkbin
 
@@ -163,10 +159,7 @@ ROOTFS_OUTPUT_TARGET_PATH=$(BUILDROOT_OUTPUT_PATH)/target
 
 MAIN_FILESYSTEM_PATH=$(ROOTFS_OUTPUT_TARGET_PATH)
 
-LOCAL_PLATFORM_UPGRADE_DIR_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/platform_upgrade_zip
-PLATFORM_UPGRADE_FILE=platform_upgrade.zip
-# FIRMWARE_ZIP_FILE=NVR1602X_32X_64X_firmware_V07R10.zip
-
+LOCAL_PLATFORM_UPGRADE_DIR_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/platform_upgrade
 
 ##################################  BUILDROOT  ########################################################## 
 
@@ -188,8 +181,6 @@ PLATFORM_ROOTFS_PATCH_PATH=$(PLATFORM_PACKAGE_PATH)/buildroot/rootfs
 #Board specific rootfs patch
 BOARD_ROOTFS_PATCH_PATH=$(PLATFORM_SUPPORTED_BOARD_PATH)/$(BOARD_NAME)/package/rootfs
 
-SDK_PROVIDED_PACKAGE_PATH=$(LOCAL_SDK_PATH)/
-
 PLATFORM_SW_VER_FILE_NAME=platform_sw_ver.txt
 
 PLATFORM_SW_VER_FILE_PATH=$(ROOTFS_OUTPUT_TARGET_PATH)/etc
@@ -203,6 +194,11 @@ FIRMWARE_RELEASE_DIR_PATH=$(SVN_SERVER)/Products/SATATYA_DEVICES/SDT/Software_Re
 #PPLICATION_FIRMWARE_NAME ?=NVR1602X_32X_64X_firmware_$(APPLICATION_VER_REV)
 #APPLICATION_FIRMWARE_ZIP ?=$(APPLICATION_FIRMWARE_NAME).zip
 
+################################## Software Release ##################################################
+HEX_FILE_NAME=RK3568_NVRL_eMMC_$(PLATFORM_SW_VER).bin
+
+PRODUCTION_RELEASE_PATH=$(MATRIX_GENERIC_SW_PLATFORM_PATH)/Software_Releases/$(BOARD_NAME)/$(PLATFORM_SW_VER)/target
+
 ##################################  uboot  ########################################################## 
 
 UBOOT_SPL_IMAGE_NAME=$(BOARD_NAME)_spl_$(PLATFORM_SW_VER).bin
@@ -215,7 +211,7 @@ UBOOT_CONFIG=$(PLATFORM_SUPPORTED_BOARD_PATH)/$(BOARD_NAME)/config/u-boot.config
 UBOOT_VERSION=u-boot
 
 # uboot packages source
-UBOOT_PACKAGE_PATH=$(SDK_PROVIDED_PACKAGE_PATH)
+UBOOT_PACKAGE_PATH=$(LOCAL_SDK_PATH)
 
 # directory where uboot to be build
 LOCAL_UBOOT_BUILD_PATH=$(PLATFORM_BUILD_PATH)/package
@@ -246,7 +242,7 @@ KERNEL_IMAGE_NAME=$(BOARD_NAME)_uImage_$(PLATFORM_SW_VER)
 KERNEL_PACKAGE=kernel
 
 #Kernel Package download path
-KERNEL_PACKAGE_PATH=$(SDK_PROVIDED_PACKAGE_PATH)/$(KERNEL_PACKAGE)
+KERNEL_PACKAGE_PATH=$(LOCAL_SDK_PATH)/$(KERNEL_PACKAGE)
 
 #Directory to store platform kernel source
 PLATFORM_KERNEL_SOURCE_PATH=$(PLATFORM_SUPPORTED_CPU_PATH)/$(KERNEL_PACKAGE)
@@ -343,14 +339,25 @@ export RK_BOOT_IMG=boot.img
 ################################## copy command  ##########################################################
 COPY=cp -rf 
 
-define msg
-	@echo -e "\033[91m"
-	@echo "========================================================================================================================================"
-	@echo "   						 $(1)"
-	@echo "========================================================================================================================================"
-	@echo -e "\033[0m"
+RED			=\033[91m
+GREEN		=\033[92m
+YELLOW		=\033[93m
+BLUE		=\033[94m
+PINK		=\033[95m
+VIOLET		=\033[96m
+COLOR		=\033[0m
+
+define msg_seperator
+	@echo -e "$(RED)=======================================================================================================================================$(COLOR)"
 endef
 
-FIRMWARE_APP_RELEASE_PATH=$(SVN_SERVER)
+define msg
+	$(call msg_seperator)
+	@echo -e "$(RED)  						 $(1) $(COLOR)"
+	$(call msg_seperator)
+endef
 
+define msg_success
+	@echo -e "$(GREEN)================= $(1) =================$(COLOR)"
+endef
 

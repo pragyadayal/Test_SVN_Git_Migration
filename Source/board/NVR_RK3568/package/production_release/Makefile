@@ -8,35 +8,30 @@ endif
 
 ################################ Production and firmware release path and variable ##################################### 
 #define Production bin generated path
-TARGET_DIR_NAME=$(PLATFORM_SW_VER)/target/$(BOARD_NAME)$(BOARD_VARIANT)
-
-HEX_FILE_NAME=RK3568_NVRL_eMMC_$(PLATFORM_SW_VER).bin
-
-PRODUCTION_RELEASE_PATH=$(MATRIX_GENERIC_SOFTWARE_MODULE)/Platform/Software_Releases/$(BOARD_NAME)
-MINILOADER_IMAGE_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/$(UBOOT_SPL_IMAGE_NAME)
-IDBLOADER_IMAGE_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/$(IDBLOADER_IMAGE_NAME)
-U_BOOT_IMAGE_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/$(UBOOT_IMAGE_NAME)
-KERNEL_IMAGE_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/kernel/$(KERNEL_IMAGE_NAME)
-ROOTFS_IMAGE_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/$(ROOTFS_IMAGE_NAME)
-PRODUCTION_HEX_PATH=$(PLATFROM_BUILD_OUTPUT_PATH)/$(HEX_FILE_NAME)
-USBUPGRADE_OUTPUT_PATH=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/usbupgrade
+MINILOADER_IMAGE_PATH=$(PRODUCTION_RELEASE_PATH)/$(UBOOT_SPL_IMAGE_NAME)
+IDBLOADER_IMAGE_PATH=$(PRODUCTION_RELEASE_PATH)/$(IDBLOADER_IMAGE_NAME)
+U_BOOT_IMAGE_PATH=$(PRODUCTION_RELEASE_PATH)/$(UBOOT_IMAGE_NAME)
+KERNEL_IMAGE_PATH=$(PRODUCTION_RELEASE_PATH)/kernel/$(KERNEL_IMAGE_NAME)
+ROOTFS_IMAGE_PATH=$(PRODUCTION_RELEASE_PATH)/$(ROOTFS_IMAGE_NAME)
+PRODUCTION_HEX_PATH=$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/$(HEX_FILE_NAME)
+USBUPGRADE_OUTPUT_PATH=$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/usbupgrade
 GPT_PARAMETER_NAME=$(BOARD_NAME)_gpt_part.img
 RESOURCE_IMG_NAME=$(BOARD_NAME)_Resource_img_$(PLATFORM_SW_VER).img
 
 MKIMAGE_TOOL_PATH=$(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools
 
 #GPT size is captured from IDB loader image size
-GPT_PART_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(GPT_PARAMETER_NAME) | cut -f1`
+GPT_PART_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(GPT_PARAMETER_NAME) | cut -f1`
 #uboot size is captured from uboot image size
-IDB_LOADER_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(IDBLOADER_IMAGE_NAME) | cut -f1`
+IDB_LOADER_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(IDBLOADER_IMAGE_NAME) | cut -f1`
 #uboot size is captured from uboot image size
-UBOOT_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(UBOOT_IMAGE_NAME) | cut -f1`
+UBOOT_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(UBOOT_IMAGE_NAME) | cut -f1`
 #Resource part size is captured from Resource image size
-RESOURCE_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(RESOURCE_IMG_NAME) | cut -f1`
+RESOURCE_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(RESOURCE_IMG_NAME) | cut -f1`
 #Kernel size is captured from kernel image size
-KERNEL_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(KERNEL_IMAGE_NAME) | cut -f1`
+KERNEL_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(KERNEL_IMAGE_NAME) | cut -f1`
 #Rootfs size is captured from rootfs image size
-ROOTFS_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(ROOTFS_IMAGE_NAME) | cut -f1`
+ROOTFS_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(ROOTFS_IMAGE_NAME) | cut -f1`
 
 SIZE=$(shell expr $(GPT_PART_SIZE) + $(IDB_LOADER_SIZE) + $(UBOOT_SIZE) + $(RESOURCE_SIZE) + $(KERNEL_SIZE) + $(ROOTFS_SIZE))
 
@@ -44,9 +39,10 @@ USB_SCRIT_SOURCE_FILE=$(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbu
 USB_SCRIPT_IMG_FILE=$(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.img
 ##############################################################################################################
 
-all: matrix_fs copy_content resourceImg usbbootscript generate_zip genProdBin
+all: matrix_fs copy_from_release usbbootscript generate_usb_upgrade_zip genProdBin
+# all: copy_to_release
 
-matrix_fs:extra_lib matrix_patch build_fs install platform_upgrade_zip
+matrix_fs: extra_lib matrix_patch build_fs resourceImg copy_to_output #copy_to_release
 
 matrix_patch:
 
@@ -64,7 +60,7 @@ matrix_patch:
 	svn export --force $(FIRMWARE_RELEASE_DIR_PATH) $(PLATFORM_BUILD_PATH)/app_firmware/
 	mv $(PLATFORM_BUILD_PATH)/app_firmware/*_firmware_*.zip $(PLATFORM_BUILD_PATH)/app_firmware/final_firmware.zip
 	
-#	-----------------------------------------------------------------------------------	
+	#	-----------------------------------------------------------------------------------	
 	# package increpted  then add logic of decryption
  	#-cd $(TOOLS_PATH)/$(BOARD_NAME) && \
  	#./fwdecrypt $(PLATFORM_BUILD_PATH)/app_firmware/final_firmware.zip $(PLATFORM_BUILD_PATH)/app_firmware/dec_final_firmware.zip
@@ -75,10 +71,10 @@ matrix_patch:
  	#fi
 	unzip $(PLATFORM_BUILD_PATH)/app_firmware/final_firmware.zip -d $(PLATFORM_BUILD_PATH)/app_firmware/temp/
 
-#	----------------------------OR-----------------------------------------------------
+	#	----------------------------OR-----------------------------------------------------
 
 	# Field package extraction (application + platform package)
-#	make -C $(APPLICATION_DIR_PATH) production BUILDROOT_TARGET_PATH=$(BUILDROOT_TARGET_PATH) BOARD_TYPE=$(BOARD_TYPE)
+	#make -C $(APPLICATION_DIR_PATH) production BUILDROOT_TARGET_PATH=$(BUILDROOT_TARGET_PATH) BOARD_TYPE=$(BOARD_TYPE)
 	
 	chmod -R 755 $(PLATFORM_BUILD_PATH)/app_firmware/
 	cp -rf $(PLATFORM_BUILD_PATH)/app_firmware/temp/* $(ROOTFS_OUTPUT_TARGET_PATH)
@@ -110,17 +106,46 @@ build_fs:
 	
 	$(call msg,   Rootfs Build Success )
 	
-install:
-	cp -rf $(BUILDROOT_OUTPUT_PATH)/images/$(BUILDROOT_ROOTFS_NAME) $(PLATFROM_BUILD_OUTPUT_PATH)/$(ROOTFS_IMAGE_NAME);
+genProdBin:
+
+	$(call msg, Generate hex for production)
+	rm -rf $(PRODUCTION_HEX_PATH)
 	
-platform_upgrade_zip:
+	#generate GPT partition image from parameter file
+	$(SDK_UPGRADE_TOOL_PATH)/upgrade_tool GPT $(PARTITION_TXT_FILE_PATH) $(PRODUCTION_RELEASE_PATH)/$(GPT_PARAMETER_NAME)
+	
+	objcopy --gap-fill=0xff --pad-to=$(SIZE)  -I binary -O binary $(PRODUCTION_RELEASE_PATH)/$(IDBLOADER_IMAGE_NAME) $(PRODUCTION_HEX_PATH)
+	
+	$(call msg_success, Adding Parameter file to flash image)
+	@dd if=$(PRODUCTION_RELEASE_PATH)/$(GPT_PARAMETER_NAME) of=$(PRODUCTION_HEX_PATH) seek=0 conv=sync
+	
+	$(call msg_success, Adding idbloader to flash image)
+	@dd if=$(PRODUCTION_RELEASE_PATH)/$(IDBLOADER_IMAGE_NAME) of=$(PRODUCTION_HEX_PATH) seek=64 conv=sync
+	
+	$(call msg_success, Adding U-boot to flash image)
+	@dd if=$(PRODUCTION_RELEASE_PATH)/$(UBOOT_IMAGE_NAME) of=$(PRODUCTION_HEX_PATH) seek=16384 conv=sync
+	
+	$(call msg_success, Adding resource part to flash image)
+	@dd if=$(PRODUCTION_RELEASE_PATH)/$(RESOURCE_IMG_NAME) of=$(PRODUCTION_HEX_PATH) seek=26624 conv=sync
+		
+	$(call msg_success, Adding Kernel to flash image)
+	@dd if=$(PRODUCTION_RELEASE_PATH)/$(KERNEL_IMAGE_NAME) of=$(PRODUCTION_HEX_PATH) seek=38912 conv=sync
+	
+	$(call msg_success, Adding FileSystem to flash image)
+	@dd if=$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/$(ROOTFS_IMAGE_NAME) of=$(PRODUCTION_HEX_PATH) seek=104448 conv=sync
+	
+	$(call msg, Generate hex for $(BOARD_TYPE)$(BOARD_VARIANT) production done)
+	
+	$(call msg, Please commit Production hex bin at PATH: $(PRODUCTION_HEX_PATH))
+	
+copy_to_output:
+	$(call msg_success, Copy buildroot images)
+	cp -rf $(BUILDROOT_OUTPUT_PATH)/images/$(BUILDROOT_ROOTFS_NAME) $(PLATFROM_BUILD_OUTPUT_PATH)/$(ROOTFS_IMAGE_NAME);
 
-	$(call msg, Generate platform_upgrade.zip)
-
-	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE)
+	$(call msg_success, Copy platform_upgrade files)
+	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
 
 	# create required directories
-	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/bin
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/etc
 	mkdir -p $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/lib/udev/rules.d
@@ -130,81 +155,42 @@ platform_upgrade_zip:
 
 	# copying files
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/kernel $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/kernel
+	echo $(KERNEL_UPGRADE_VER) > $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/kernel/$(KERNEL_UPGRADE_VER_FILE_NAME)
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/ko $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/ko
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/lib/udev/rules.d/81-local.rules $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/lib/udev/rules.d/81-local.rules
 
 	# deleting empty directories
 	find $(LOCAL_PLATFORM_UPGRADE_DIR_PATH) -type d -empty -delete
 	
-	cd $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/ && zip -r -y -q -9 $(PLATFORM_UPGRADE_FILE) *
-	mv $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE) $(PLATFROM_BUILD_OUTPUT_PATH)
-	rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
+	#cd $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/ && zip -r -y -q -9 $(PLATFORM_UPGRADE_FILE) *
+	#mv $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/$(PLATFORM_UPGRADE_FILE) $(PLATFROM_BUILD_OUTPUT_PATH)
+	#rm -rf $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)
 	
-	$(call msg,platform_upgrade_zip ZIP is generated)
-
-genProdBin:
-
-	$(call msg, Generate hex for production)
-	rm -rf $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME)
-	
-	#generate GPT partition image from parameter file
-	$(SDK_UPGRADE_TOOL_PATH)/upgrade_tool GPT $(PARTITION_TXT_FILE_PATH) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(GPT_PARAMETER_NAME)
-	
-	 
-	objcopy --gap-fill=0xff --pad-to=$(SIZE)  -I binary -O binary $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(IDBLOADER_IMAGE_NAME) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME)
-	
-	
-	# Add gpt partition to flash image
-	@echo "==============Adding Parameter file to flash image============="
-	@dd if=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(GPT_PARAMETER_NAME) of=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME) seek=0 conv=sync
-	
-	
-	# Add idbloader to flash image
-	@echo "==============Adding idbloader to flash image============="
-	@dd if=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(IDBLOADER_IMAGE_NAME) of=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME) seek=64 conv=sync
-	
-	
-	# Add u-boot to flash image
-	@echo "==============Adding U-boot to flash image============="
-	@dd if=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(UBOOT_IMAGE_NAME) of=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME) seek=16384 conv=sync
-	
-	# Add resource part to flash image
-	@echo "==============Adding resource part to flash image=============="
-	@dd if=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(RESOURCE_IMG_NAME) of=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME) seek=26624 conv=sync
-		
-	# Add Kernel  to flash image
-	@echo "==============Adding Kernel to flash image=============="
-	@dd if=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(KERNEL_IMAGE_NAME) of=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME) seek=38912 conv=sync
-	
-	# Add rootfs to flash image
-	@echo "==============Adding FileSystem to flash image============"
-	@dd if=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(ROOTFS_IMAGE_NAME) of=$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(HEX_FILE_NAME) seek=104448 conv=sync
-	
-	
-	@echo  "board variant $(BOARD_VARIANT)"
-	
-	$(call msg, Generate hex for $(BOARD_VARIANT) production done)
-	
-	$(call msg, Please commit Production hex bin at PATH:\n    $(PRODUCTION_HEX_PATH))
-	
-copy_content:
+copy_to_release:
 
 	$(call msg,  Production Release start )
 	
-	rm -rf $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)
-	mkdir -p $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)
-	#copy to software release path for production release
+	mkdir -p $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
+
+	$(call msg_success,Copy to Software_Release path for Production Release)
 	
-	cp -rf $(IDBLOADER_IMAGE_PATH) 	$(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
-	cp -rf $(MINILOADER_IMAGE_PATH) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
-	cp -rf $(U_BOOT_IMAGE_PATH) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
-	cp -rf $(KERNEL_IMAGE_PATH) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
-	cp -rf $(ROOTFS_IMAGE_PATH) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
-	cp -rf $(BUILDROOT_OUTPUT_PATH)/images/rootfs.tar  $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
+	cp -rf $(IDBLOADER_IMAGE_PATH)		$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(MINILOADER_IMAGE_PATH)		$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(U_BOOT_IMAGE_PATH)			$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(KERNEL_IMAGE_PATH)			$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(ROOTFS_IMAGE_PATH)			$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
+	cp -rf $(BUILDROOT_OUTPUT_PATH)/images/rootfs.tar  $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
 	
 	$(call msg,  Production release done )
 	
-	$(call msg, Please commit all binary for Production release at PATH:\n    $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME))
+	$(call msg, Please commit all binary for Production release at PATH: $(PRODUCTION_RELEASE_PATH))
+
+copy_from_release:
+	$(call msg_success, Copy kernel )
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(KERNEL_IMAGE_NAME) $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/kernel/rk3568_nvr_uImage
+	# $(call msg_success, Copy drivers )
+	$(call msg_success, Copy platform_upgrade files )
+	cp -rf $(PRODUCTION_RELEASE_PATH)/platform_upgrade/* $(ROOTFS_OUTPUT_TARGET_PATH)/
 
 usbbootscript:
 
@@ -249,7 +235,7 @@ usbbootscript:
 	
 	$(call msg, $(BOARD_TYPE)_usbupgrade.img generated in target Dir!!)
 	
-generate_zip:
+generate_usb_upgrade_zip:
 	
 	$(call msg, Generating  USB Upgrade zip started)
 	
@@ -261,13 +247,13 @@ generate_zip:
 	#cp -rf $(USB_SCRIPT_IMG_FILE) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.img
 	echo -n "$(BOARD_TYPE)/$(BOARD_TYPE)_signature.txt;$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.img;" > $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/package
 	
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(UBOOT_IMAGE_NAME)  $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(RESOURCE_IMG_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(KERNEL_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(ROOTFS_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(UBOOT_IMAGE_NAME)  $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(RESOURCE_IMG_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(KERNEL_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/$(ROOTFS_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
 	
 	cd $(USBUPGRADE_OUTPUT_PATH) && zip -ruy $(PRODUCTION_ZIP_NAME) $(BOARD_TYPE)
-	mv $(USBUPGRADE_OUTPUT_PATH)/$(PRODUCTION_ZIP_NAME) $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/
+	mv $(USBUPGRADE_OUTPUT_PATH)/$(PRODUCTION_ZIP_NAME) $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
 	rm -rf $(USBUPGRADE_OUTPUT_PATH)
 	
 	$(call msg, Generating  USB Upgrade zip successfully)
@@ -281,6 +267,6 @@ resourceImg:
 	
 	#cd $(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION) && ./scripts/pack_resource.sh $(LOCAL_KERNEL_BUILD_PATH)/$(KERNEL_VERSION)/resource.img
 	
-	cp -rf  $(LOCAL_KERNEL_BUILD_PATH)/$(KERNEL_VERSION)/resource.img  $(PRODUCTION_RELEASE_PATH)/$(TARGET_DIR_NAME)/$(RESOURCE_IMG_NAME)
+	cp -rf  $(LOCAL_KERNEL_BUILD_PATH)/$(KERNEL_VERSION)/resource.img  $(PRODUCTION_RELEASE_PATH)/$(RESOURCE_IMG_NAME)
 	$(call msg, Generating Resource successfully)
 	
