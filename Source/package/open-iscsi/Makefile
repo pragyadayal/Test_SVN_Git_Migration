@@ -56,6 +56,7 @@ build:
 	cd $(OPEN_ISNS_SOURCE_DIR) && make install_lib
 	
 	cd $(OPEN_ISCSI_SOURCE_DIR) && make CC=$(CC) NO_SYSTEMD=1 all; \
+	make CC=$(CC) NO_SYSTEMD=1 all; \
 	make install DESTDIR=$(OPEN_ISCSI_INSTALL_DIR)
 	$(call msg, build is done )
 	
