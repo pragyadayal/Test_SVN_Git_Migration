@@ -40,7 +40,6 @@ USB_SCRIPT_IMG_FILE=$(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupg
 ##############################################################################################################
 
 all: matrix_fs copy_from_release usbbootscript generate_usb_upgrade_zip genProdBin
-# all: copy_to_release
 
 matrix_fs: extra_lib matrix_patch build_fs resourceImg copy_to_output #copy_to_release
 
@@ -158,6 +157,8 @@ copy_to_output:
 	echo $(KERNEL_UPGRADE_VER) > $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/kernel/$(KERNEL_UPGRADE_VER_FILE_NAME)
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/matrix/ko $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/matrix/ko
 	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/lib/udev/rules.d/81-local.rules $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/lib/udev/rules.d/81-local.rules
+	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/lib/libelf* $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/lib/
+	cp -rf $(ROOTFS_OUTPUT_TARGET_PATH)/sbin/ip $(LOCAL_PLATFORM_UPGRADE_DIR_PATH)/sbin/
 
 	# deleting empty directories
 	find $(LOCAL_PLATFORM_UPGRADE_DIR_PATH) -type d -empty -delete
@@ -174,12 +175,12 @@ copy_to_release:
 
 	$(call msg_success,Copy to Software_Release path for Production Release)
 	
-	cp -rf $(IDBLOADER_IMAGE_PATH)		$(PRODUCTION_RELEASE_PATH)/
-	cp -rf $(MINILOADER_IMAGE_PATH)		$(PRODUCTION_RELEASE_PATH)/
-	cp -rf $(U_BOOT_IMAGE_PATH)			$(PRODUCTION_RELEASE_PATH)/
-	cp -rf $(KERNEL_IMAGE_PATH)			$(PRODUCTION_RELEASE_PATH)/
-	cp -rf $(ROOTFS_IMAGE_PATH)			$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
-	cp -rf $(BUILDROOT_OUTPUT_PATH)/images/rootfs.tar  $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
+	cp -rf $(PLATFROM_BUILD_OUTPUT_PATH)/$(IDBLOADER_IMAGE_NAME)		$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(PLATFROM_BUILD_OUTPUT_PATH)/$(UBOOT_SPL_IMAGE_NAME)		$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(PLATFROM_BUILD_OUTPUT_PATH)/$(UBOOT_IMAGE_NAME)			$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(PLATFROM_BUILD_OUTPUT_PATH)/kernel/$(KERNEL_IMAGE_NAME)	$(PRODUCTION_RELEASE_PATH)/
+	cp -rf $(PLATFROM_BUILD_OUTPUT_PATH)/$(ROOTFS_IMAGE_NAME)			$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
+	cp -rf $(BUILDROOT_OUTPUT_PATH)/images/rootfs.tar.xz  				$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
 	
 	$(call msg,  Production release done )
 	
