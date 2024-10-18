@@ -238,6 +238,9 @@ KERNEL_VERSION=kernel
 #kernel img name 
 KERNEL_IMAGE_NAME=$(BOARD_NAME)_uImage_$(PLATFORM_SW_VER)
 
+#resource img name
+RESOURCE_IMG_NAME=$(BOARD_NAME)_Resource_img_$(PLATFORM_SW_VER).img
+
 #package source
 KERNEL_PACKAGE=kernel
 

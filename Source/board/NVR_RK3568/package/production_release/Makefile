@@ -16,7 +16,7 @@ ROOTFS_IMAGE_PATH=$(PRODUCTION_RELEASE_PATH)/$(ROOTFS_IMAGE_NAME)
 PRODUCTION_HEX_PATH=$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/$(HEX_FILE_NAME)
 USBUPGRADE_OUTPUT_PATH=$(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/usbupgrade
 GPT_PARAMETER_NAME=$(BOARD_NAME)_gpt_part.img
-RESOURCE_IMG_NAME=$(BOARD_NAME)_Resource_img_$(PLATFORM_SW_VER).img
+
 
 MKIMAGE_TOOL_PATH=$(LOCAL_UBOOT_BUILD_PATH)/$(UBOOT_VERSION)/tools
 
@@ -35,6 +35,12 @@ ROOTFS_SIZE=`du -b $(PRODUCTION_RELEASE_PATH)/$(ROOTFS_IMAGE_NAME) | cut -f1`
 
 SIZE=$(shell expr $(GPT_PART_SIZE) + $(IDB_LOADER_SIZE) + $(UBOOT_SIZE) + $(RESOURCE_SIZE) + $(KERNEL_SIZE) + $(ROOTFS_SIZE))
 
+
+##############################USB upgrade path and variables #################################################
+UBOOT_USB_IMAGE_NAME=$(BOARD_NAME)_uboot_$(PRODUCT_VER_REV).img
+RESOURCE_USB_IMG_NAME=$(BOARD_NAME)_Resource_img_$(PRODUCT_VER_REV).img
+KERNEL_USB_IMAGE_NAME=$(BOARD_NAME)_uImage_$(PRODUCT_VER_REV)
+ROOTFS_USB_IMAGE_NAME=$(BOARD_NAME)$(BOARD_VARIANT)_rootfs_$(PRODUCT_VER_REV).ext4
 USB_SCRIT_SOURCE_FILE=$(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.txt
 USB_SCRIPT_IMG_FILE=$(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.img
 ##############################################################################################################
@@ -198,27 +204,27 @@ usbbootscript:
 	rm -rf   $(USBUPGRADE_OUTPUT_PATH)
 	mkdir -p $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)
 	@echo "echo ==== Programming Uboot start =====" >> $(USB_SCRIT_SOURCE_FILE)
-	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(UBOOT_IMAGE_NAME) "|| rockchip_show_bmp B_U_F.bmp" "&& exit" >> $(USB_SCRIT_SOURCE_FILE)
+	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(UBOOT_USB_IMAGE_NAME) "|| rockchip_show_bmp B_U_F.bmp" "&& exit" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc erase  0x00004000 0x1fff" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc write  0x09400000 0x4000 0x1fff" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "rockchip_show_bmp B_U_S.bmp" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "echo ###### Programming Uboot Complete ######" >> $(USB_SCRIT_SOURCE_FILE)
 	
 	@echo "echo ==== Programming Resource Img Start =====" >> $(USB_SCRIT_SOURCE_FILE)
-	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(RESOURCE_IMG_NAME)  "|| rockchip_show_bmp  K_U_F.bmp" "&& exit" >> $(USB_SCRIT_SOURCE_FILE)
+	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(RESOURCE_USB_IMG_NAME)  "|| rockchip_show_bmp  K_U_F.bmp" "&& exit" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc erase 0x6800 0x2FFF" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc write  0x09400000  0x6800 0x2FFF" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "echo ###### Programming Resourec Complete ######" >> $(USB_SCRIT_SOURCE_FILE)
 	
 	@echo "echo ==== Programming Kernel Start =====" >> $(USB_SCRIT_SOURCE_FILE)
-	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(KERNEL_IMAGE_NAME)  "|| rockchip_show_bmp  K_U_F.bmp" "&& exit " >> $(USB_SCRIT_SOURCE_FILE)
+	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(KERNEL_USB_IMAGE_NAME)  "|| rockchip_show_bmp  K_U_F.bmp" "&& exit " >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc erase 0x9800 0xFFFF" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc write  0x09400000  0x9800 0xFFFF" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "rockchip_show_bmp  K_U_S.bmp" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "echo ###### Programming Kernel Complete ######" >> $(USB_SCRIT_SOURCE_FILE)
 
 	@echo "echo ==== Programming Rootfs Start =====" >> $(USB_SCRIT_SOURCE_FILE)
-	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(ROOTFS_IMAGE_NAME) "|| rockchip_show_bmp F_S_U_F.bmp" "&& exit" >> $(USB_SCRIT_SOURCE_FILE)
+	@echo "fatload usb 0:1 0x09400000 "$(BOARD_TYPE)/$(ROOTFS_USB_IMAGE_NAME) "|| rockchip_show_bmp F_S_U_F.bmp" "&& exit" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc erase  0x19800 0x1FFFFF" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "mmc write 0x09400000  0x00019800 0x1FFFFF" >> $(USB_SCRIT_SOURCE_FILE)
 	@echo "rockchip_show_bmp F_S_U_S.bmp" >> $(USB_SCRIT_SOURCE_FILE)
@@ -248,10 +254,10 @@ generate_usb_upgrade_zip:
 	#cp -rf $(USB_SCRIPT_IMG_FILE) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.img
 	echo -n "$(BOARD_TYPE)/$(BOARD_TYPE)_signature.txt;$(BOARD_TYPE)/$(BOARD_TYPE)_usbupgrade.img;" > $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/package
 	
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(UBOOT_IMAGE_NAME)  $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(RESOURCE_IMG_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(KERNEL_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
-	cp -rf $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/$(ROOTFS_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(UBOOT_IMAGE_NAME)  $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(UBOOT_USB_IMAGE_NAME)
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(RESOURCE_IMG_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(RESOURCE_USB_IMG_NAME)
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(KERNEL_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(KERNEL_USB_IMAGE_NAME)
+	cp -rf $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)/$(ROOTFS_IMAGE_NAME) $(USBUPGRADE_OUTPUT_PATH)/$(BOARD_TYPE)/$(ROOTFS_USB_IMAGE_NAME)
 	
 	cd $(USBUPGRADE_OUTPUT_PATH) && zip -ruy $(PRODUCTION_ZIP_NAME) $(BOARD_TYPE)
 	mv $(USBUPGRADE_OUTPUT_PATH)/$(PRODUCTION_ZIP_NAME) $(PRODUCTION_RELEASE_PATH)/$(PRODUCT_VER_REV)
