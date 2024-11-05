@@ -1,0 +1,48 @@
+
+###################################################################
+# Directory Structure:
+# 	source		: The matrix source code and patches
+# 	build		  : Compilation outputs
+# 	resource	: Original source codes, SDK, Package tarball
+# 	release		: Result binaries ready for Production/QA
+#
+# Platform:
+#   SDK_PATH                 : /root/platform/resource
+#   PLATFORM_SOURCE_PATH     : /root/platform/source
+#   PLATFORM_BUILD_PATH      : /root/platform/build
+#   PRODUCTION_RELEASE_PATH  : /root/platform/release
+#
+# Command:
+# MAKE_TARGET="all production_release" \
+# MAKE_ARGS="BOARD_TYPE=NVR_RK3568 PRODUCT_VERSION=V08 PRODUCT_REVISION=R07 BOARD_VARIANT=L" \
+# SOURCE_PATH="Briefcase/SWD_Briefcase/GenericSoftwareModules/Platform/SWD/Branches/Releases/NVR_RK3568/8.7.0/Source" \
+# docker-compose --file compose-rk3568.yaml run platform
+# # OR define above variables in .env file 
+# # OR export them in current running shell
+#
+# Shell could be accessed by following command:
+# docker-compose --file compose-rk3568.yaml run platform bash
+###################################################################
+
+version: '3'
+services:
+  platform:
+    image: ipvs
+    user: 1000:1000
+    volumes:
+      - $HOME/.subversion:/root/.subversion:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      # Toolchain
+      - /opt:/opt:rw
+      # Resource
+      - $SVN_HOME_DIR:/root:rw
+    environment:
+      SVN_HOME_DIR: /root
+      MAKE_ARGS:    ${MAKE_ARGS}
+      MAKE_TARGET:  ${MAKE_TARGET}
+      SOURCE_PATH:  ${SOURCE_PATH}
+    working_dir: /root/$SOURCE_PATH
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - make $MAKE_ARGS $MAKE_TARGET

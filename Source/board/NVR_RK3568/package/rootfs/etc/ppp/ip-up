@@ -1,9 +1,0 @@
-#!/bin/bash
-
-if [ $IFNAME = "ppp2" ]; then
-	interface="usb"
-else
-	interface="eth`echo $IFNAME|tail -c 2`"
-fi
-
-/matrix/bin/netDevDetect.bin "PPP" $interface "UP" $IPLOCAL "255.255.255.255" $IPREMOTE $DNS1 $DNS2
