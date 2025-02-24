@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : Kuldip Kanzariya
+//   File         : ReadersPara.html
+//   Description  : 
+///////////////////////////////////////////////////////////////////////////// -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/config/ReadersPara.js"></script>
+<script type="text/javascript" src="js/config/networkCommon.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<script type="text/javascript" src="js/common/jquery.tooltipster.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<link rel="stylesheet" type="text/css" href="css/tooltipster.css">
+</head>
+<style type="text/css" media="screen">
+	select
+	{
+		/* Select property needs more offset*/
+		width 			: 120px;	
+	}
+	table .td-param-label-1 
+	{
+		width : 132px;
+	}
+	table .td-param-label-2 
+	{
+		width : 242px;
+	}
+	table .td-param-label-3 
+	{
+		width : 158px;
+	}
+	table .td-param-label-4 
+	{
+		width : 172px;
+	}
+	fieldset 
+	{
+		border-width: 1px;
+	}
+	.tab-pills>li 
+	{
+		width			: 150px;
+		vertical-align 	: middle;
+		display 		: inline-block;
+		float 			: left;
+		text-align 		: center;
+		cursor 			: pointer;
+		height			: 15px;
+		padding			: 9px;
+	}		
+	#IntrnlRdrFeq,#ExtnlRdrFeq
+	{
+		/* Select property needs more offset*/
+		background-color	: #FFFFF;
+		border 			: 1px solid #a9a9a9;
+		width 			: 120px;
+		height 			: 18px;
+		color			: #2f2f2f;
+	}
+/*	#ExtnlRdrFeq
+	{*/
+		/* Select property needs more offset*/
+		/*background-color	: #FFFFF;
+		border 			: 1px solid #a9a9a9;
+		width 			: 95px;
+		height 			: 18px;
+		color			: #2f2f2f;
+}*/
+	.param-table 
+	{
+		margin: 15px 0px 0px 31px;
+	}	
+	#ShowLastFpFpRdr
+	{
+			width : 150px;
+	}
+	.btn-image_disabled:hover,
+	.btn-image_disabled:focus
+	{
+		background-color:#FFFFFF;
+	}
+	.btn-image_disabled
+	{
+		background-color: #FFFFFF;
+		opacity : 0.75;
+	}
+	.btn-image:hover,
+	.btn-image:focus
+	{
+	cursor: pointer;
+	background-color: #D5E0EA;
+	}
+	label 
+	{
+		vertical-align 	: middle;
+		margin 			: 0px 8px 0px 0px; 
+	}
+	.tabDiv
+	{
+		margin: 26px 8px;
+	}
+</style>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<div id="ReadersPara" class="mainPageDiv" >
+		<table class="header-table">
+			<tr>
+				<td class="configpage-header"> <label align="left" class="configpage-header-label"  name ="ReaderParaLabel"> </label>
+			</tr>
+		</table>
+		<table class="tab-table">
+			<tr>
+				<td class="configsubpage-header">
+					<div>
+						<ul class="tab tab-pills">
+							<li id="ReaderParaTab"><a name="ReaderParaTab"> </a> </li>
+							<li id="FingerParaTab"><a name="FingerParaTab"> </a> </li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td id="ReaderPara-div">
+					<div class="tabDiv">	
+						<fieldset id="FpRdrParaField">
+								<legend>
+										<label name="FpRdrPara" style="padding-left: 12px;font-size:14px;font-weight:500;color:#393838;"> </label>
+						    	</legend>								
+						<table class="param-table">
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="SecLevel"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="SecLevel">
+										<option value="0"	name="normalSecLevel"> </option>
+										<option value="1"	name="SecureSecLevel"> </option>
+										<option value="2"	name="HighSecLevel"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="sensLevel"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="sensLevel">
+										<option value="0"	name="LevelDigit1"> </option>
+										<option value="1"	name="LevelDigit2"> </option>
+										<option value="2"	name="LevelDigit3"> </option>
+										<option value="3"	name="LevelDigit4"> </option>
+										<option value="4"	name="LevelDigit5"> </option>
+										<option value="5"	name="LevelDigit6"> </option>
+										<option value="6"	name="LevelDigit7"> </option>
+										<option value="7"	name="LevelDigit8"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="ImgQuality"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="ImgQuality">
+										<option value="0"	name="ImgWeak"> </option>
+										<option value="1"	name="ImgModerate"> </option>
+										<option value="2"	name="ImgStrong"> </option>
+										<option value="3"	name="ImgStrongest"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="LightConditn"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="LightConditn">
+										<option value="1"	name="InDoor"> </option>
+										<option value="0"	name="OutDoor"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="IdentiSpeed"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="IdentiSpeed">
+										<option value="0"	name="Mode1"> </option>
+										<option value="1"	name="Mode2"> </option>
+										<option value="2"	name="Mode3"> </option>
+										<option value="3"	name="Mode4"> </option>
+										<option value="4"	name="Mode5"> </option>
+										<option value="5"	name="Mode6"> </option>
+										<option value="6"	name="ModeAuto"> </option>
+									</select>
+								</td>
+							</tr>																																			
+						</table>
+						</fieldset>							
+						<fieldset id="EmpRdrParaField">
+						  <legend>
+						    <label name="EmpRdrPara" style="padding-left: 12px;font-size:14px;font-weight:500;color:#393838;"> </label>
+						  </legend>
+						<table class="param-table">
+							<tr id="IntrnlRdrFeqRow">
+								<td class="td-param-label-4">
+									<label  name="IntrnlRdrFeq"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="IntrnlRdrFeq">
+										<option value="0"	name="Feq120"> </option>
+										<option value="1"	name="Feq121"> </option>
+										<option value="2"	name="Feq122"> </option>
+										<option value="3"	name="Feq123"> </option>
+										<option value="4"	name="Feq125"> </option>
+										<option value="5"	name="Feq126"> </option>
+										<option value="6"	name="Feq127"> </option>
+										<option value="7"	name="Feq129"> </option>
+										<option value="8"	name="Feq130"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-4">
+									<label  name="ExtnlRdrFeq"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="ExtnlRdrFeq">
+										<option value="0"	name="Feq120"> </option>
+										<option value="1"	name="Feq121"> </option>
+										<option value="2"	name="Feq122"> </option>
+										<option value="3"	name="Feq123"> </option>
+										<option value="4"	name="Feq125"> </option>
+										<option value="5"	name="Feq126"> </option>
+										<option value="6"	name="Feq127"> </option>
+										<option value="7"	name="Feq129"> </option>
+										<option value="8"	name="Feq130"> </option>
+									</select>
+								</td>
+							</tr>
+						</table>
+						</fieldset>						
+						<fieldset id="TmpParaField">
+						  <legend>
+						    <label name="TmpPara" style="padding-left: 12px;font-size:14px;font-weight:500;color:#393838;"> </label>
+						  </legend>
+						<table class="param-table">
+							<tr>
+								<td class="td-param-label-4">
+									<label  name="TmpPara"> </label>
+								</td>
+								<td class="td-param-value">
+									<input id="TempParam" maxlength="100" style="width:500px;" type="text">
+								</td>
+							</tr>
+						</table>
+						</fieldset>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%;padding-left:8px;"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitRdrPara" name="submit" style="margin-left:41px" />
+											<input type="button" id="cancelRdrPara" name="cancel" /> 
+											<input type="button" id="defaultRdrPara" name="default" />  
+									</div>
+								</td>
+							</tr>	
+						</table>						
+					</div>										
+				</td>
+				<td id="FingerPara-div" class="none">
+					  <div class="tabDiv">							
+						    <table class="param-table">
+							    <tr>
+								<td class="td-param-label-2">
+									    <label name="GetParaVal"> </label>
+								</td>
+								<td class="td-param-value">
+									    <input type="text" id="GetParaVal" maxlength="4" style="width:137px;"/>
+								    </td>								
+							    </tr>
+							    <tr id="TmpltIntrnlFprRow">
+								<td class="td-param-label-2">
+									    <label name="TmpltIntrnlFpr"> </label>
+								</td>
+								<td class="td-param-value">
+									    <input type="text" disabled = "disabled" id="TmpltIntrnlFpr" style="border: none;width: 137px;"/>
+								    </td>								
+							    </tr>
+							    <tr>
+								<td class="td-param-label-2">
+									    <label name="TmpltExtnlFpr"> </label>
+								</td>
+								<td class="td-param-value">
+									    <input type="text" readonly="readonly" disabled = "disabled" id="TmpltExtnlFpr" style="border: none;width: 137px;"/>
+								    </td>								
+							    </tr>
+							    <tr id="IntnlFprBuildDateRow">
+								<td class="td-param-label-2">
+									    <label name="IntnlFprBuildDate"> </label>
+								</td>
+								<td class="td-param-value">
+									    <input type="text" readonly="readonly" disabled = "disabled" id="IntnlFprBuildDate" style="border: none; width: 137px;"/>
+								    </td>								
+							    </tr>
+							    <tr>
+								<td class="td-param-label-2">
+									    <label name="ExtnlFprBuildDate"> </label>
+								</td>
+								<td class="td-param-value">
+									    <input type="text" readonly="readonly" disabled = "disabled" id="ExtnlFprBuildDate" style="border: none;width: 137px"/>
+								    </td>								
+							    </tr>
+							    <tr>
+								<td class="td-param-label-2">
+									    <label name="UpgradeFprFrmware"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="UpgradeFprFrmware" style="width: 137px;">
+										<option value="0"	name="None"> </option>
+										<option value="2"	name="ExtnlFpr"> </option>
+									</select>
+									<form id="webCustomFileForm" name="webCustmFileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+										<input type="file" id="webCustmFile" name="webCustmFile" style="width:220px; opacity: 0; filter:alpha(opacity=75); z-index: 2" size="225">
+									</form>
+										<input type="text" style="width:190px;" id="image-filepath" name="chooseFileStr" autocomplete="off" disabled="disabled" >
+										<img id="custmFileBrowseBtn" name="webCustmFileBrowseBtn" src="Images/Browse.png" class="btn-image" >
+										<img id="uploadCustomStingFileBtn" src="Images/Upgrade.png" class="btn-image" name="upgrade" >
+								    </td>								
+							    </tr>						    							    							
+						    </table>
+						<table >
+							<tr>
+								<td class="msg-space" style="width:100%;padding-left:0px;"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitFpRdr" name="submit" style="margin-left:31px" />
+											<input type="button" id="cancelFpRdr" name="cancel" /> 
+											<input type="button" id="ShowLastFpFpRdr" name="ShowLastFp"/>  
+									</div>
+								</td>
+							</tr>	
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>	
+	</div>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : Hardik Patel
+//   File         : Wallpaper.html
+//   Description  : 
+///////////////////////////////////////////////////////////////////////////// --> 
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/jquery.tooltipster.min.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/config/Wallpaper.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<script type="text/javascript" src="js/common/MxCommonProcess.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<link rel="stylesheet" type="text/css" href="css/tooltipster.css">
+</head>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<style>
+		.image_attr 
+		{
+			width:110px;
+			height:100px;
+			width:70px;
+			margin-left:32px
+		}
+		
+		.image_align
+		{
+			width:110px;
+		}
+		
+		.image_align1
+		{
+			margin-top:30px;
+		}
+		
+		.table-align
+		{
+			margin-bottom:10px;
+			width:97%;
+		}
+		
+	</style>
+	<div id="WallPaper" class="mainPageDiv" >
+		<table class="header-table">
+			<tr>
+				<td class="configpage-header"> <label align="left" class="configpage-header-label"  name ="wallPaper"> </label>
+			</tr>
+		</table>
+		<table class="table-align">
+			<tr> </tr>
+			<tr>
+				<td>
+					<label  name="wallPaperFormatSupportMsg" style="margin:0px 8px 0px 30px;font-size: 11px; color:#77777A";> </label>
+				</td>
+			</tr>
+		</table>
+		<table class="table-align">
+			<tr>
+				<td style="width:50%">
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img1" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper1" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt1"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_1"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper1Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath1" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn1" name="wallPaperBrowseBtn1" src="Images/Browse.png">
+												<img id="uploadImage1" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>	
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img2" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper2" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt2"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_2"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper2Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath2" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn2" name="wallPaperBrowseBtn2" src="Images/Browse.png">
+												<img id="uploadImage2" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img3" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper3" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt3"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_3"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper3Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath3" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn3" name="wallPaperBrowseBtn3" src="Images/Browse.png"  >
+												<img id="uploadImage3" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img4" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper4" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt4"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_4"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper4Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9; cursor:default;" id="image-filepath4" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn4" name="wallPaperBrowseBtn4" src="Images/Browse.png" >
+												<img id="uploadImage4" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img5" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper5" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt5"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_5"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper5Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath5" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn5" name="wallPaperBrowseBtn5" src="Images/Browse.png" >
+												<img id="uploadImage5" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img6" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper6" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt6"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_6"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper6Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath6" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn6" name="wallPaperBrowseBtn6" src="Images/Browse.png">
+												<img id="uploadImage6" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img7" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper7" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt7"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_7"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper7Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath7" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn7" name="wallPaperBrowseBtn7" src="Images/Browse.png">
+												<img id="uploadImage7" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img8" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper8" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt8"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_8"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper8Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath8" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn8" name="wallPaperBrowseBtn8" src="Images/Browse.png">
+												<img id="uploadImage8" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img9" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper9" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt9"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_9"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper9Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath9" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn9" name="wallPaperBrowseBtn9" src="Images/Browse.png">
+												<img id="uploadImage9" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img10" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper10" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt10"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_10"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper10Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath10" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn10" name="wallPaperBrowseBtn10" src="Images/Browse.png" >
+												<img id="uploadImage10" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img11" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper11" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt11"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_11"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper11Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath11" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn11" name="wallPaperBrowseBtn11" src="Images/Browse.png" >
+												<img id="uploadImage11" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+				<td>
+					<div class="image_align1">
+						<table>
+							<tr>
+								<td class="image_align">
+									<img id="img12" class="image_attr">
+								</td>
+								<td>
+									<table>
+										<tr>
+											<td>
+												<img id="setCurrentWallPaper12" src="Images/current wallpaper.png">
+												<label id="setCurrentWallPapertxt12"> </label>
+											</td>
+										</tr>
+										<tr>
+										</tr>
+										<tr>	
+											<td>
+												<label id="invalidMsg_12"> </label> 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<form id="wallPaper12Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+													<input type="file" id="inputwallPaperFormId" name="inputwallPaperFormId" style="width:220px; opacity: 0;  display: none; filter:alpha(opacity=75); z-index: 2" size="225" >
+												</form>
+												<input type="text" style="width:190px; background-color: #E7E7E7;border: 1px solid #a9a9a9;cursor:default;" id="image-filepath12" name="chooseWallpaperstr" autocomplete="off" readonly="readonly" onfocus="this.blur()" >
+												<img id="wallPaperBrowseBtn12" name="wallPaperBrowseBtn12" src="Images/Browse.png">
+												<img id="uploadImage12" name="tooltipMsgUpdate" src="Images/Upload.png" class="btn-image tooltip" >
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body> 

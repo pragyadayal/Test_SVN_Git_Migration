@@ -1,0 +1,1 @@
+ setenv bootargs console=ttyO0,115200n8 vt.global_cursor_default=0 consoleblank=0 root=ubi0:rootfs rw ubi.mtd=7,2048 noinitrd rootfstype=ubifs rootflags=sync mem=512M omap2-nand.0:128k(SPL),128k(SPL.backup1),128k(SPL.backup2),128k(SPL.backup3),1280k(U-Boot),384k(U-Boot-Env),5m(Kernel),-(Rootfs) quiet

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : Meetkumar Bariya
+//   File         : system_test.html
+//   Description  : 
+///////////////////////////////////////////////////////////////////////////// -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<script type="text/javascript" src="js/config/system_test.js"></script>
+<script type="text/javascript" src="js/config/networkCommon.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+</head>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<style>
+		.tab-pills > li
+		{
+			width	: 180px;
+		}
+		table .td-param-label-1
+		{
+			width 	: 178px;
+		}
+		table .td-param-label-2
+		{
+			width 	: 95px;
+		}
+		table .td-param-label-3
+		{
+			width 	: 272px;
+		}
+		table .td-param-label-4
+		{
+			width 	: 188px;
+		}
+		table .td-param-label-5
+		{
+			width 	: 60px;
+		}
+		table .td-param-label-6
+		{
+			width 	: 163px;
+		}
+		table .td-param-label-7
+		{
+			width 	: 131px;
+		}
+		table .td-param-label-8
+		{
+			width 	: 222px;
+		}
+		table .td-param-label-9
+		{
+			width 	: 80px;
+		}
+		input[type="text"],input[type="password"] 
+		{
+			width	: 137px;
+		}
+		select
+		{
+			width	: 141px;	
+		}
+		.settingbtn input[type="button"]
+		{
+			width	: 83px;
+		}
+		.List-table tr:hover>td 
+		{
+			border: 1px solid #605454;
+			background-color: #CED7DF;
+			cursor: pointer;
+		}
+		.config-leftpart
+		{
+			height: 152px;
+		}
+	</style>
+	<div id="SystemTest" class="mainPageDiv">
+		<table class="header-table">
+			<tr>
+				<td class="configpage-header"><label align="left" class="configpage-header-label" name="systemTest" > </label></td>
+			</tr>
+		</table>
+		<table class="tab-table">
+			<tr>
+				<td class="configsubpage-header">
+					<div>
+						<ul class="tab tab-pills">
+							<li id="basicInfo"><a name="basicInfo"> </a> </li>
+							<li id="hwTest"><a name="hwTest"> </a> </li>
+							<li id="readerTest"><a name="readerTest"> </a> </li>
+							<li id="genIOTest" style="width: 205px;"><a name="genIOTest"> </a> </li>
+							<li id="others"><a name="others"> </a> </li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<table>
+			<tr id="BasicInfo-div" class="none">
+				<td>
+					<div  class="tabDiv" >
+						<table class="param-table" style="margin-left: 30px;">
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="employeeName"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="employeeName" maxlength="30" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="employeeID"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="employeeID" maxlength="15" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="deviceSerialNo"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="deviceSerialNo" maxlength="15" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="mainPCBHWDesine"> </label>
+								</td>
+								<td class="td-param-value" style="width: 170px;">
+									<input type="text" id="mainPCBHWDesine" maxlength="15" />
+								</td>
+								<td class="td-param-label-2">
+									<label  name="softwareVersion"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="mainPCBSWVersion" maxlength="6" class="readOnlyField" disabled = "disabled" style="border: none;"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="connectorHWDesign"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="connectorHWDesign" maxlength="15" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="macAddress"> </label>
+								</td>
+								<td class="td-param-value" style="width: 170px;">
+									<input type="text" id="macAddress" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+								<td class="td-param-label-2">
+									<label  name="result"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="result"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="date"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="date" maxlength="10" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="ftpIPAddress"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="ftpIPAddress" maxlength="15" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="ftpUserName"> </label>
+								</td>
+								<td class="td-param-value" style="width: 170px;">
+									<input type="text" id="ftpUserName" maxlength="15" />
+								</td>
+								<td class="td-param-label-2">
+									<label  name="ftpPassword"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="password" id="ftpPassword" maxlength="15" />
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitBasicInfo" name="submit" style="margin-left:32px" /> 
+									</div>
+								</td>
+							</tr>	
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr id="hwTest-div" class="none">
+				<td>
+					<div  class="tabDiv" >
+						<table class="param-table" >
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="assemblerName"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="assemblerName" maxlength="30" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="assemblerID"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="assemblerID" maxlength="15" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage0"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage0"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage1"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage1"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage2"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage2"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage3"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage3"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage4"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage4"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage5"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage5"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="vegaVoltage6"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="vegaVoltage6"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-3">
+									<label  name="frequency"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="checkbox" id="frequency"/>
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitHWTest" name="submit" style="margin-left:32px" /> 
+									</div>
+								</td>
+							</tr>	
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr id="readerTest-div" class="none">
+				<td>
+					<div  class="tabDiv">
+						<table>
+							<tr>
+								<td style="width: 35%; ">
+									<table class="param-table" style="margin-left: 30px;">
+										<tr>
+											<td class="td-param-label-4">
+												<label  name="intCardReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<select id="intCardReader" style="width: 151px;">
+													<option value="0" name="intReader0"> </option>
+													<option id="EMProxOp" value="1" name="intReader1"> </option>
+													<option id="HIDProxOp" value="2" name="intReader2"> </option>
+													<option value="3" name="intReader3"> </option>
+													<option value="4" name="intReader4"> </option>
+													<option value="6" name="intReader5"> </option>
+												</select>
+											</td>
+										</tr>
+										<tr id="internalFPReader">
+											<td class="td-param-label-4">
+												<label  name="intFingerReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<select id="intFingerReader" style="width: 151px;">
+													<option value="0" name="readerType0"> </option>
+													<option value="5" name="readerType5"> </option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td class="td-param-label-4">
+												<label  name="extReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<select id="extReader" style="width: 151px;">
+													<option value="0" name="readerType0"> </option>
+													<option value="1" name="readerType1"> </option>
+													<option value="2" name="readerType2"> </option>
+													<option value="3" name="readerType3"> </option>
+													<option value="4" name="readerType4"> </option>
+													<option value="5" name="readerType5"> </option>
+													<option value="6" name="readerType6"> </option>
+													<option value="8" name="readerType8"> </option>
+													<option value="9" name="readerType9"> </option>
+													<option value="10" name="readerType10"> </option>
+													<option value="11" name="readerType11"> </option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td class="td-param-label-4">
+												<label  name="lastDetectedCardReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="text" id="lastDetectedCardReader" class="readOnlyField" disabled = "disabled" style="border: none; width: 150px;"/>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td>
+									<table class="param-table">
+										<tr>
+											<td class="td-param-label-5">
+												<label  name="status"> </label>
+											</td>
+											<td class="td-param-value" >
+												<input type="text" id="intCardReaderStatus" class="readOnlyField" disabled = "disabled" style="border: none; width: 190px;" />
+											</td>
+										</tr>
+										<tr id="internalFPReaderStatus">
+											<td class="td-param-label-5">
+												<label  name="status"> </label>
+											</td>
+											<td class="td-param-value" style="width : 230px; ">
+												<input type="text" id="intFingerReaderStatus" class="readOnlyField" disabled = "disabled" style="border: none; width: 190px;" />
+											</td>
+											<td class="td-param-label-9">
+												<label  name="fpReaderSrNo"> </label>
+											</td>
+											<td class="td-param-value" >
+												<input type="text" id="fpReaderSrNo" class="readOnlyField" disabled = "disabled" style="border: none; width: 150px;" />
+											</td>
+										</tr>
+										<tr>
+											<td class="td-param-label-5">
+												<label  name="status"> </label>
+											</td>
+											<td class="td-param-value" >
+												<input type="text" id="extReaderStatus" class="readOnlyField" disabled = "disabled" style="border: none; width: 190px;" />
+											</td>
+										</tr>
+										<tr>
+											<td class="td-param-label-5">
+												<label  name="cardID"> </label>
+											</td>
+											<td class="td-param-value" >
+												<input type="text" id="cardID" class="readOnlyField" disabled = "disabled" style="border: none; width: 190px;" />
+											</td>
+										</tr>
+									</table>
+								</td>	
+							</tr>	
+						</table>
+						<table>
+							<tr> </tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="setReader" name="setReader" style="margin-left:32px" />
+											<input type="button" id="refresh" 	name="refreshSts"  />
+									</div>
+								</td>
+							</tr>	
+						</table>
+						<table>
+							<tr>
+								<td style="width: 20%; ">
+									<table class="param-table" style="margin-left: 30px;">
+										<tr>
+											<td class="td-param-label-6">
+												<label  name="intEMProxReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="checkbox" id="intEMProxRdrResult"/>
+											</td>
+										</tr>
+										<tr>
+											<td class="td-param-label-6">
+												<label  name="intHIDProxReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="checkbox" id="intHIDProxRdrResult"/>
+											</td>
+										</tr>										
+										<tr id="row0">
+											<td class="td-param-label-6">
+												<label  name="intMiFareReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="checkbox" id="intMiFareRdrResult"/>
+											</td>
+										</tr>										
+									</table>
+								</td>
+								<td>
+									<table class="param-table">										
+										<tr id="row1">
+											<td class="td-param-label-4">
+												<label  name="intHIDiClassReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="checkbox" id="intHIDiClassURdrResult"/>
+											</td>
+										</tr>
+										<tr id="row2">
+											<td class="td-param-label-4">
+												<label  name="vegaExternelUReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="checkbox" id="vegaExternelURdrResult"/>
+											</td>
+										</tr>
+										<tr id="row3">
+											<td class="td-param-label-4">
+												<label  name="vegaExternelWReader"> </label>
+											</td>
+											<td class="td-param-value">
+												<input type="checkbox" id="vegaExternelWRdrResult"/>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitReaderResult" name="submit" style="margin-left:32px" /> 
+									</div>
+								</td>
+							</tr>	
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr id="genIOTest-div" class="none">
+				<td>
+					<div class="tabDiv">
+						<table class="param-table" style="margin-left: 30px;">
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="buzzer"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="buzzerTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="buzzerTestRes"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="touchPanel"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="touchPanelTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="touchPanelTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<!-- <tr>
+								<td class="td-param-label-7">
+									<label  name="auxRelay"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="auxRelayTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="auxRelayTestRes"/>
+								</td>
+							</tr> -->
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="doorRelay"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="doorRelayTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="doorRelayTestRes"/>
+								</td>
+							</tr>
+							<!-- <tr>
+								<td class="td-param-label-7">
+									<label  name="auxInput"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="auxInTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="auxInTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr> -->
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="doorSense"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="doorSenseTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="doorSenseTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="systemTamper"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="sysTampTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="sysTampTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<!-- <tr>
+								<td class="td-param-label-7">
+									<label  name="exitRdrTamper"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="exitRdrTampTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5" >
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="exitRdrTampTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr> -->
+							<!-- <tr>
+								<td class="td-param-label-7">
+									<label  name="lockTamper"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="lookTampTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="lookTampTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr> -->
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="exitSwitch"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="exitSWTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="exitSWTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="usb"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="usb" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+									<td>
+									<input type="text" id="usbTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="mmcCard"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="mmcCardTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="mmcCardTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="RTC"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="RTCTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="RTCTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-7">
+									<label  name="lcd"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="lcdTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="lcdTestRes"/>
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitGenericIOInfo" name="submit" style="margin-left:32px" /> 
+									</div>
+								</td>
+							</tr>	
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr id="others-div" class="none">
+				<td>
+					<div  class="tabDiv">
+						<table class="param-table" style="margin-left: 30px;">
+							<tr id="userFpEnrollment">
+								<td class="td-param-label-8">
+									<label  name="userEnroll"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="userEnrollTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="userEnrollTestRes"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-8">
+									<label  name="wifiTest"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="wifiTest" name="searchWifi" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="wifiTestRes"/>
+								</td>
+							</tr>
+							<tr id="bluetoothTestTr">
+								<td class="td-param-label-8">
+									<label  name="bluetoothTest"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="bluetoothTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="text" id="bluetoothTestRes" class="readOnlyField" disabled = "disabled" style="border: none;" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-8">
+									<label  name="sysDefault"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="sysDefaultTest" name="startTest" />
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label  name="result"> </label>
+								</td>
+								<td>
+									<input type="checkbox" id="sysDefaultTestRes"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-8">
+									<label  name="sysReboot"> </label>
+								</td>
+								<td class="td-param-value" style="width: 120px;">
+									<div style="margin: 0px auto 0px auto;">
+										<input type="text" id="sysRebootCount" style="margin-left: 7px; width: 80px;" maxlength="3">
+									</div>
+								</td>
+								<td class="td-param-label-5">
+									<label name="sysRebootRange"> </label>
+								</td>
+								<td>
+									<div class="settingbtn" style="margin: 0px auto 0px auto;">
+										<input type="button" id="sysRebootTest" name="startTest" style="margin-left: 0px;"/>
+									</div>
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitOtherInfo" name="submit" style="margin-left:32px" /> 
+									</div>
+								</td>
+							</tr>	
+						</table>
+						<table style="margin-left: 30px;">
+							<tr>
+								<td>
+									<div id="wifiTable" class="config-leftpart" style="width: 610px">
+										<table class="List-table" >
+											<tr class="header1">
+												<style>#number{width:13%} </style>
+												<th id="number" ><label name="number"> </label></th>
+					
+												<style>#nwName{width:50%} </style>
+												<th id="nwName"><label name="nwName"> </label></th>
+												
+												<style>#nwType{width:24%} </style>
+												<th id="nwType" ><label name="nwType"> </label></th>
+												
+												<style>#wifiIcons{width:13%} </style>
+												<th id="wifiIcons" ><label name=" "> </label></th>
+																											
+											</tr>
+											<script>
+												for(var index=1;index<=10;index++)
+												{
+													document.write("<tr id='availableNwRow"+index+"'>");
+													document.write("<style>{backgrgound-color:#FFFFFF}</style>");
+													
+													document.write("<td>");
+													document.write("<label id='number"+index+"' >"+index+"</label>");
+													document.write("</td>");
+						
+													document.write("<td>");
+													document.write("<label  id='nwName"+index+"'> </label>");
+													document.write("</td>");
+														
+													document.write("<td >");
+													document.write("<label id='nwType"+index+"' > </label>");
+													document.write("</td>");
+													
+													document.write("<td style='text-align: center;'>");
+													document.write("<img id='wifiIcons"+index+"'/>");
+													document.write("</td>");																																							
+													document.write("</tr>");
+												}
+											</script>
+										</table>
+									</div>
+									<div id="btDeviceTable" class="config-leftpart" style="width: 610px">
+										<table class="List-table" >
+											<tr class="header1">
+												<style>#btNumber{width:10%} </style>
+												<th id="btNumber" ><label name="number"> </label></th>
+					
+												<style>#btDeviceName{width:30%} </style>
+												<th id="btDeviceName"><label name="btDeviceName"> </label></th>
+												
+												<style>#btSignalStrength{width:20%} </style>
+												<th id="btSignalStrength" ><label name="btSignalStrength"> </label></th>													
+											</tr>
+											<script>
+												for(var index=1;index<=10;index++)
+												{
+													document.write("<tr id='availableBtDevRow"+index+"'>");
+													document.write("<style>{backgrgound-color:#FFFFFF}</style>");
+													
+													document.write("<td>");
+													document.write("<label id='btNumber"+index+"' >"+index+"</label>");
+													document.write("</td>");
+						
+													document.write("<td>");
+													document.write("<label  id='btDeviceName"+index+"'> </label>");
+													document.write("</td>");
+													
+													document.write("<td style='text-align: center;'>");
+													document.write("<label  id='btSignalStrength"+index+"'> </label>");
+													document.write("</td>");																																							
+													document.write("</tr>");
+												}
+											</script>
+										</table>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<table  style="border-top: 1pt solid #a5a5a5; margin-top: 30px;">
+			<div>
+				<tr>
+					<td>
+						<div class="settingbtn" style="margin-top: 20px;">
+							<input type="button" id="generateReport" name="generateReport" style="margin-left: 32px; width:180px;" /> 
+							<input type="button" id="displayReport" name="displayReport" style="width: 180px;"/> 
+							<input type="button" id="sendReportToFTP" name="sendReportToFTP" style="width: 180px;"/>
+						</div>
+					</td>
+				</tr>
+			</div>
+		</table>
+	</div>
+</body>
+</html>

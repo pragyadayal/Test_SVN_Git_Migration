@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : Manish Chandra
+//   File         : BackupAndUpdate.html
+//   Description  : This page provide provision of firmware upgrade, configuration restore,
+// 
+///////////////////////////////////////////////////////////////////////////// -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/config/BackupAndUpdate.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<script type="text/javascript" src="js/common/jquery.tooltipster.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<link rel="stylesheet" type="text/css" href="css/tooltipster.css">
+</head>
+<style type="text/css" media="screen">
+	select
+	{
+		/* Select property needs more offset*/
+		background-color: #FFFFF;
+		border			: 1px solid #a9a9a9;
+		width 			: 136px;
+		height 			: 18px;
+		color			: #2f2f2f;		
+	}
+	
+	.config-leftpart {
+		padding: 0px;
+		vertical-align: top;
+		height: 152px;
+		margin: 15px 0px 0px 20px;
+		border: 0px solid #605454;
+		width:  900px;
+		overflow: auto;
+	}
+	table .td-param-label-1 
+	{
+		width : 152px;
+	}
+	table .td-param-label-2 
+	{
+		width : 76px;
+	}
+	table .td-param-label-3 
+	{
+		width : 158px;
+	}
+
+	input[type="text"],input[type="password"] 
+	{
+		padding-left 		: 2px;
+		padding-top 		: 1px;
+		padding-bottom 		: 2px;
+		background-color	: #FFFFF;
+		border 				: 1px solid #a9a9a9;
+		width 				: 132px;
+		height 				: 14px;
+		color				: #2f2f2f;
+	}
+	.btn-image_disabled:hover,
+	.btn-image_disabled:focus
+	{
+		background-color:#FFFFFF;
+	}
+	.btn-image_disabled
+	{
+		background-color: #FFFFFF;
+		opacity : 0.75;
+	}
+	.btn-image:hover,
+	.btn-image:focus{
+	cursor: pointer;
+	background-color: #D5E0EA;
+	}
+	
+</style>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<div id="BackupAndUpdateSettings" class="mainPageDiv">
+		<table class="header-table">
+			<tr>
+				<td class="configpage-header"><label align="left" id="mainHeader" class="configpage-header-label" name="backupAndUpgrade" > </label>
+			</tr>
+		</table>
+		<table class="tab-table">
+			<tr id = "subHeaderRow">
+				<td class="configsubpage-header">
+					<div>
+						<ul class="tab tab-pills">
+							<li id="backupAndUpgrade" ><a name="backupAndUpgrade"> </a> </li>
+							<li id="autoFirmawreUpgde"><a name="autoFirmawreUpgde"> </a> </li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td id="backupAndUpgrade-div">
+					<div class="tabDiv">
+						<table class="param-table">
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="upgradeFor"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="upgradeFor">
+										<option value="0" name="doorFw"> </option>
+										<option value="1" name="readerFw"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="upgradeFirmware"> </label>
+								</td>
+								<td class="td-param-value">
+									<form id="upgradeFirmwareForm" name="upgradeFirmwareForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+										<input type="file" id="upgradeFirmwareFile" name="upgradeFirmwareFile" style="width:220px; opacity: 0; filter:alpha(opacity=75); z-index: 2" size="225">
+									</form>
+										<input type="text" style="width:190px;" id="image-upgradeFirmwarefilepath" name="chooseFilestr" autocomplete="off" disabled="disabled" >
+
+										<img id="upgradeFirmwareBrowseBtn" name="upgradeFirmwareBrowseBtn" src="Images/Browse.png" class="btn-image" >
+										<img id="upgradeFirmwareUploadBtn" src="Images/Upgrade.png" class="btn-image" name="upgrade" >
+										
+								</td>
+							</tr>
+							<tr id="restoreCnfgRow">
+								<td class="td-param-label-1">
+									<label  name="rstoreCnfg"> </label>
+								</td>
+								<td class="td-param-value">
+									<form id="rstoreCnfgForm" name="rstoreCnfgForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+										<input type="file" id="rstoreCnfgFile" name="rstoreCnfgFile" style="width:220px; opacity: 0; filter:alpha(opacity=75); z-index: 2" size="225">
+									</form>
+										<input type="text" style="width:190px;" id="image-rstoreCnfgfilepath" name="chooseFilestr" autocomplete="off" disabled="disabled" >
+
+										<img id="rstoreCnfgBrowseBtn" name="rstoreCnfgBrowseBtn" src="Images/Browse.png" class="btn-image" >
+										<img id="rstoreCnfgRestoreBtn" src="Images/Restore.png" class="btn-image" name="restor" >
+										
+								</td>
+							</tr>
+							
+							<tr  id="backupEvntRow">
+								<td class="td-param-label">
+									<label name="backupEvnt"> </label>
+								</td>
+								<td class="td-param-value" style="text-align: left;">
+									<div>
+										<img id="backupEvntBtn" src="Images/Download.png" class="btn-image" name="download" >	
+									</div>
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
