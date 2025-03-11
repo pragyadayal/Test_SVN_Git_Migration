@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : MAnish Chandra
+//   File         : ModeSpecificwallpaper.html
+//   Description  : 
+///////////////////////////////////////////////////////////////////////////// -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/config/ModeSpecificWallpaper.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<script type="text/javascript" src="js/common/jquery.tooltipster.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<link rel="stylesheet" type="text/css" href="css/tooltipster.css">
+</head>
+<style type="text/css" media="screen">
+	
+	fieldset 
+	{
+    margin: 20px 0px 0px 10px;
+    padding-bottom: 0px;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    border-width: 1px;
+	}
+	table .td-param-label-1
+	{
+		width :150px;
+	}
+	
+	table .td-param-label-2
+	{
+		width :134px;
+	}
+	
+	table .td-param-label-3
+	{
+		width :121px;
+	}
+	.btn-image_disabled
+	{
+		background-color: #FFFFFF;
+		opacity : 0.75;
+	}
+	
+	.btn-image_disabled:hover,
+	.btn-image_disabled:focus
+	{
+		background-color:#FFFFFF;
+	}
+	.param-table 
+	{
+		margin 			: 15px 0px 0px 30px ;
+	}
+</style>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<div id="ModeSpecificWalpaper" class="mainPageDiv">
+	<table class="header-table">
+			<tr>
+				<td class="configpage-header"><label align="left" class="configpage-header-label"  name ="modeSpecificWalpaper"> </label></td>
+			</tr>
+	</table>
+	<table >
+		<tr> </tr>
+		<tr>
+			<td>
+				<label style="margin-left:30px; color: gray; font-size: 11px"  name="wallPaperFormatSupportMsg"> </label>
+			</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td>
+				<div>
+					<fieldset id="entryModeWall"  >
+						<legend>
+							<label name="entryModeWall" style="font-weight:500; font-size: 14px"> </label>
+						</legend>
+					</fieldset>	
+					<table  style="margin-bottom:10px">
+					<tr>
+						<td >
+							<div >
+								<table>
+									<tr>
+										<td style="width:110px">
+											<img id="img1" style="margin-left:32px; height:100px;width:70px" >
+										</td>
+										<td>
+											<div>
+												<table style="margin-left:10px">
+													<tr> </tr>
+													<tr> </tr>
+													<tr> </tr> 
+													<tr>
+														<td >
+															<input  type="checkbox" id="WP_ENTRY_SET_WP"/>
+															<label  name="setWallpaper"> </label>			
+														
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<form id="entryModeWappaerwallPaper1Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+																<input type="file" id="entryModewallPaper" name="wallPaper_1" style="width:220px; opacity: 0; filter:alpha(opacity=75); z-index: 2" size="225">
+															</form>
+															<input type="text" style="width:190px;" id="entryModewallPaperimage-filepath" name="chooseWallpaperstr" autocomplete="off" disabled="disabled" >
+															<img id="entryModeWappaerBrowseBtn" name="entryModeWappaerBrowseBtn" src="Images/Browse.png" class="btn-image" >
+															<img id="WP_REMOVE_1" name="entryModeWappaerDeleteBtn" src="Images/delete.png" class="btn-image" >
+															<img id="entryModeWallPaperuploadImage" name="Update" src="Images/Upload.png" class="btn-image tooltip">
+														</td>	
+													</tr>
+													 <tr>	
+														<td>
+															<label id="invalidMsg_1"> </label> 
+														</td>
+													</tr> 
+												</table>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</td>
+						</tr>
+					</table>
+					<fieldset id="exitModeWall">
+						<legend>
+							<label name="exitModeWall" style="font-weight:500; font-size: 14px"> </label>
+						</legend>
+					</fieldset>
+					<table  style="margin-bottom:10px">
+						<tr>
+							<td >
+								<div >
+									<table>
+										<tr>
+											<td style="width:110px">
+												<img id="img2" style="margin-left:32px; height:100px;width:70px" >
+											</td>
+											<td>
+												<div>
+													<table style="margin-left:10px">
+														<tr> </tr>
+														<tr> </tr>
+														<tr> </tr> 
+														<tr>
+															<td >
+																<input onfocus="this.blur()" type="checkbox" id="WP_EXIT_SET_WP"/>
+																<label  name="setWallpaper"> </label>			
+															</td>
+														</tr>
+														<tr>
+															<td>
+																<form id="exitModewallPaper1Form" name="fileForm" style="position:absolute; display: inline; "  method='post'  enctype="multipart/form-data">
+																	<input type="file" id="exitModewallPaper" name="wallPaper_1" style="width:220px; opacity: 0; filter:alpha(opacity=75); z-index: 2" size="225">
+																</form>
+																<input type="text" style="width:190px;" id="exitModeWappaeruploadImage-filepath" name="chooseWallpaperstr" autocomplete="off" disabled="disabled" >
+																<img id="exitModeWappaerBrowseBtn" name="exitModeWappaerBrowseBtn" src="Images/Browse.png" class="btn-image" >
+																<img id="WP_REMOVE_2" name="exitModeWappaerDeleteBtn" src="Images/delete.png" class="btn-image" >
+																<img id="exitModeWallpaperuploadImage" name="Update"  src="Images/Upload.png" class="btn-image tooltip">
+															</td>	
+														</tr>
+														<tr>	
+															<td>
+																<label id="invalidMsg_2"> </label> 
+															</td>
+														</tr> 
+													</table>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>	
+			</td>
+		</tr>
+	</table>		
+</div>		
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : vaibhav darji
+//   File         : BluetoothSetting.html
+//   Description  : 
+///////////////////////////////////////////////////////////////////////////// -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.tooltipster.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/config/BluetoothSetting.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<link rel="stylesheet" type="text/css" href="css/tooltipster.css">
+</head>
+<style type="text/css" media="screen">
+	
+	table .td-param-label-1
+	{
+		width :134px;
+	}
+	
+	table .td-param-label-2
+	{
+		width :134px;
+	}
+	
+	table .td-param-label-3
+	{
+		width :121px;
+	}
+	
+	.param-table 
+	{
+		margin 			: 15px 0px 0px 30px ;
+	}
+</style>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<div id="BluetoothSetting" class="mainPageDiv">
+	<table class="header-table">
+			<tr>
+				<td class="configpage-header"><label align="left" class="configpage-header-label"  name ="BluetoothSetting"> </label></td>
+			</tr>
+	</table>
+	<table>
+		<tr>
+			<td>
+				<div>
+					<table class="param-table">
+						<tr>
+							<td class="td-param-label-1">
+								<label name="AdvertiseBluetooth"> </label>
+							</td>
+							<td class="td-param-value">
+								<input type="checkbox" id="AdvertiseBluetooth"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="td-param-label-1">
+								<label  name="nameStr"> </label>
+							</td>
+							<td class="td-param-value">
+								<input type="text" id="name" maxlength="10" />
+							</td>
+						</tr>
+						<tr>
+							<td class="td-param-label">
+								<label name="btRange"> </label>
+							</td>
+							<td class="td-param-value">
+								<input type="radio" name="type" value="0" id="rangeShort"/>
+								<label name="rangeShort"> </label>					
+							</td>
+						</tr>
+						<tr>
+							<td class="td-param-label">
+								<label name=""> </label>
+							</td>							
+							<td class="td-param-value">
+								<input type="radio" name="type" value="1" id="rangeMedium"/>
+								<label name="rangeMedium"> </label>					
+							</td>
+						</tr>	
+						<tr>
+							<td class="td-param-label">
+								<label name=""> </label>
+							</td>							
+							<td class="td-param-value">
+								<input type="radio" name="type" value="2" id="rangeLong"/>
+								<label name="rangeLong"> </label>						
+							</td>
+						</tr>							
+						<tr>
+						<td class="td-param-label">
+								<label name=""> </label>
+							</td>							
+							<td class="td-param-value">
+								<input type="radio" name="type" value="3" id="rangeCustom"/>
+								<label name="rangeCustom"> </label>						
+							</td>
+						</tr>	
+						<tr id="CustomBluetoothRow">
+						<td class="td-param-label">
+								<label name="CustomBluetooth"> </label>
+								<label class="labelMandatory" > * </label>
+						</td>
+								<td class="td-param-value">
+								<label style="font-size: 11px;" name="Near"> </label>
+									<input type="range" id="CustomBluetoothRange" class="tooltip" style="width: 170px;" min="-40" max="10" value="-30" style="vertical-align: middle" step=1 />
+								<label style="font-size: 11px;" name="Far"> </label>
+									<input type="text" id="CustomBluetooth" name="CustomBluetoothWatermark" style="width: 70px;margin-bottom: 11px" maxlength="3" />
+									<img id="rangeInfo" class="btn-image tooltip" src='Images/Info 2.png' name="rangeInfoMsg" style="margin-bottom: 11px;margin-left: 5px;">
+								</td>
+						</tr>						
+						<tr>
+							<td class="td-param-label-1">
+								<label  name="MACAddress"> </label>
+							</td>
+							<td class="td-param-value">
+								<input type="text" id="MACAddress" readonly="readonly" disabled = "disabled" maxlength="17" style="border: none; width: 139px;"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="td-param-label-1">
+								<label  name="UUID"> </label>
+							</td>
+							<td class="td-param-value">
+								<input type="text" id="UUID" readonly="readonly" disabled = "disabled" maxlength="32" style="border: none;"/>
+							</td>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td class="msg-space" style="width:100%"> </td>
+						</tr>
+						<tr>
+							<td>
+								<div class="settingbtn">
+										<input type="button" id="submit" name="submit" style="margin-left:32px" />
+										<input type="button" id="cancel" name="cancel" /> 
+										<input type="button" id="default" name="default" />  
+								</div>
+							</td>
+						</tr>	
+					</table>
+				</div>	
+			</td>
+		</tr>
+	</table>		
+</div>		
+</body>
+</html>

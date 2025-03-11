@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<!-- ///////////////////////////////////////////////////////////////////////////
+//
+//   MMM     MMM       AAA       TTTTTTTTTT  RRRRRR    IIIIIIII  XX   XX
+//   MMMM   MMMM      AA AA          TT      RR   RR      II      XX XX
+//   MM MM MM MM     AA   AA         TT      RR    RR     II       xxx
+//   MM  MM   MM    AAAAAAAAA        TT      RRRRRRR      II       xxx
+//   MM       MM   AA       AA       TT      RR  RR       II      XX XX
+//   MM       MM  AA         AA      TT      RR   RR   IIIIIIII  XX   XX
+//
+//   Company      : Matrix Comsec Pvt. Ltd., Baroda, India.
+//   Project      : Cosec Door
+//   Created By   : Meetkumar Bariya
+//   File         : WifiSettings.html
+//   Description  : 
+///////////////////////////////////////////////////////////////////////////// -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="js/common/jquery.min.js"></script>
+<script type="text/javascript" src="js/common/jquery.caret.js"></script>
+<script type="text/javascript" src="js/common/cookie.js"></script>
+<script type="text/javascript" src="js/config/WifiSetting.js"></script>
+<script type="text/javascript" src="js/config/networkCommon.js"></script>
+<script type="text/javascript" src="js/common/MxTranslator.js"></script>
+<script type="text/javascript" src="js/common/MxCommon.js"></script>
+<script type="text/javascript" src="js/common/jquery.tooltipster.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<link rel="stylesheet" type="text/css" href="css/tooltipster.css">
+</head>
+<style type="text/css" media="screen">
+	select
+	{
+		width 			: 155px;
+	}
+
+	.List-table .header1 th {
+		text-align:center;
+		padding:0px 8px;
+		font-size: 12px;
+		font-style:normal;
+		height: 25px;
+		background-color: #F1F0F0;
+		border: 1px solid #000;	
+	}
+	
+	.List-table .header1 th label {
+		vertical-align:middle;
+		margin-left: -5px;
+	}
+	
+	.List-table td {
+		padding:0px 8px;
+		height: 15px;
+		background-color: #FFFFFF;
+		border: 1px solid #605454;
+		text-align: left;
+	}
+	
+	.List-table tr:hover>td {
+		border: 1px solid #605454;
+		background-color: #CED7DF;
+		cursor: pointer;
+	}
+	
+	.List-table a {
+		color: #3A3939;
+		text-align: left;
+	}
+	
+	.List-table tr.active>td,.List-table tr.active td>a {
+		/*color: #3498DB;*/
+		color: #1D64AD;
+		background-color: #E6E6E6;
+	}
+	
+	.config-leftpart {
+		padding: 0px;
+		vertical-align: top;
+		height: 152px;
+		margin: 15px 0px 0px 20px;
+		border: 0px solid #605454;
+		width:  900px;
+		overflow: auto;
+	}
+	table .td-param-label-1 
+	{
+		width : 115px;
+	}
+	table .td-param-label-2 
+	{
+		width : 76px;
+	}
+	table .td-param-label-3 
+	{
+		width : 158px;
+	}
+
+	input[type="text"],input[type="password"] 
+	{
+		padding-left 		: 2px;
+		padding-top 		: 1px;
+		padding-bottom 		: 2px;
+		background-color	: #FFFFF;
+		border 				: 1px solid #a9a9a9;
+		width 				: 132px;
+		height 				: 14px;
+		color				: #2f2f2f;
+	}	
+</style>
+<body>
+	<script type="text/javascript">logout(getCookie('MxSessionIdCookie'));</script>
+	<div id="WifiSettings" class="mainPageDiv">
+		<table class="header-table">
+			<tr>
+				<td class="configpage-header"><label align="left" class="configpage-header-label" name="wifiSetting" > </label>
+			</tr>
+		</table>
+		<table class="tab-table">
+			<tr>
+				<td class="configsubpage-header">
+					<div>
+						<ul class="tab tab-pills">
+							<li id="WiFiNwstg" ><a name="WiFiNwstg"> </a> </li>
+							<li id="WiFiAccsPntstg"><a name="WiFiAccsPntstg"> </a> </li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<td>
+					<div id="WiFiNwstg-div" class="none">
+						<table class="param-table">
+							<tr id="ipAssignment-Tr">
+								<td class="td-param-label-1">
+									<label  name="ipAssignment"> </label>
+								</td>
+								<td class="td-param-value">
+									<select id="ipAssignment" style="width: 137px">
+										<option value="0"	name="static"> </option>
+										<option value="1"	name="dynamic"> </option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="ipAddress"> </label>
+									<label class="labelMandatory" > * </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="ipAddress" maxlength="15" />
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="subNetMask"> </label>
+									<label class="labelMandatory" > * </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="subNetMask" maxlength="15"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label name="defaultGateWay"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="defaultGateWay" maxlength="15"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="preferredDNS"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="preferredDNS" maxlength="15"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="alternetDNS"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="alternetDNS" maxlength="15"/>
+								</td>	
+							</tr>
+							<tr>
+								<td class="td-param-label-1">
+									<label  name="MACAddress"> </label>
+								</td>
+								<td class="td-param-value">
+									<input type="text" id="MACAddress" readonly="readonly" disabled = "disabled" maxlength="17" style="border: none;"/>
+								</td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td class="msg-space" style="width:100%"> </td>
+							</tr>
+							<tr>
+								<td>
+									<div class="settingbtn">
+											<input type="button" id="submitNwSetting" name="submit" style="margin-left:32px" />
+											<input type="button" id="cancelNwSetting" name="cancel" /> 
+											<input type="button" id="defaultNwSetting" name="default" />  
+									</div>
+								</td>
+							</tr>	
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div id="WiFiAccsPntstg-div" class="none">
+						<fieldset style="margin-top: 0px">
+							<legend >
+								<label name="acsPointStng"> </label>
+							</legend>
+						</fieldset>	
+						<div class="tabDiv">
+							<table class="param-table" style="margin-top: 10px">
+								<tr>
+									<td class="td-param-label-3">
+										<label name="wifi"> </label>
+									</td>
+									<td class="td-param-value">
+										<input type="checkbox"	id="wifi">
+									</td>	
+								</tr>
+								<tr id="connectionStatusTR">
+									<td class="td-param-label-3">
+										<label name="connectionStatus"> </label>
+									</td>
+									<td class="td-param-value">
+										<input type="text" id="connectionStatus" class="readOnlyField" disabled = "disabled" style="border: none; width: 150px" />
+                                                                                <img id="signalStrength" src=""/>
+										<img id="RefreshImage" src="Images/Refresh.png" class="btn-image tooltip" name="refresh" />								
+									</td>	
+								</tr>
+								<tr id="SsidNwNameTR">
+									<td class="td-param-label-3">
+										<label  name="SsidNwName"> </label>
+									</td>
+									<td class="td-param-value">
+										<input type="text" id="SsidNwName" maxlength="32" style="height: 15px; width: 150px"/>
+									</td>	
+								</tr>
+								<tr id="cnctvtOptn-TR">
+									<td class="td-param-label-3">
+										<label  name="cnctvtOptn"> </label>
+									</td>
+									<td class="td-param-value">
+										<select id="cnctvtOptn">
+											<option value="0"	name="pwd"> </option>
+											<option value="1"	name="pinFrmAcsPnt"> </option>
+										</select>
+									</td>
+								</tr>
+								<tr id="pin-TR">
+									<td class="td-param-label-3">
+										<label  name="pin"> </label>
+										<label class="labelMandatory" > * </label>
+									</td>
+									<td class="td-param-value">
+										<input type="password" id="pin" maxlength="9" style="width: 150px"/>
+									</td>	
+								</tr>
+								<tr id="SecType-TR">
+									<td class="td-param-label-3">
+										<label  name="SecType"> </label>
+									</td>
+									<td class="td-param-value">
+										<select id="SecType">
+											<option value="0"	name="noAuth"> </option>
+											<option value="1"	name="wep"> </option>
+											<option value="2"	name="wpa"> </option>
+											<option value="3"	name="wpaPersonal"> </option>
+											<option value="4"	name="wpaEnterprise"> </option>
+											<option value="5"	name="wpa2Enterprise"> </option>
+										</select>
+									</td>
+								</tr>
+								<tr id="encryptionTypeTR">
+									<td class="td-param-label-3">
+										<label  name="encryptionType"> </label>
+									</td>
+									<td class="td-param-value">
+										<select id="encryptionType">
+											<option value="0"	name="psk"> </option>
+											<option value="1"	name="eap"> </option>
+										</select>
+									</td>
+								</tr>
+								<tr id="advncAuthTR">
+									<td class="td-param-label-3">
+										<label  name="advncAuth"> </label>
+									</td>
+									<td class="td-param-value">
+										<select id="advncAuth">
+											<option value="0"	name="auto"> </option>
+											<option value="1"	name="tls"> </option>
+											<option value="2"	name="leap"> </option>
+											<option value="3"	name="fast"> </option>
+											<option value="4"	name="tunneledTls"> </option>
+											<option value="5"	name="peap"> </option>
+										</select>
+									</td>
+								</tr>
+								<tr id="anonymsIdenttTR">
+									<td class="td-param-label-3">
+										<label name="anonymsIdentt"> </label>
+									</td>
+									<td class="td-param-value" >
+										<input type="text" id="anonymsIdentt" class="input-medium" maxlength="50"/>
+									</td>
+								</tr>
+								<tr id="usernameTR">
+									<td class="td-param-label-3">
+										<label name="username"> </label>
+										<label class="labelMandatory" > * </label>
+									</td>
+									<td class="td-param-value">
+										<input type="text" id="username" class="input-medium" maxlength="50"/>
+									</td>
+								</tr>
+								<tr id="secKeyTR">
+									<td class="td-param-label-3">
+										<label name="secKey"> </label>
+										<label class="labelMandatory" > * </label>
+									</td>
+									<td class="td-param-value">
+										<input id="secKey" class="input-medium" maxlength="64" type="password"/>
+									</td>
+								</tr>
+								<tr id="peapVerTR">
+									<td class="td-param-label-3">
+										<label  name="peapVer"> </label>
+									</td>
+									<td class="td-param-value">
+										<select id="peapVer">
+											<option value="0"	name="auto"> </option>
+											<option value="1"	name="ver0"> </option>
+											<option value="2"	name="ver1"> </option>
+											<option value="3"	name="peapLabel1"> </option>
+										</select>
+									</td>
+								</tr>
+								<tr id="innerAuthTR">
+									<td class="td-param-label-3">
+										<label  name="innerAuth"> </label>
+									</td>
+									<td class="td-param-value">
+										<select id="innerAuth">
+											<option value="0"	name="auto"> </option>
+											<option value="1"	name="mschapv2"> </option>
+											<option value="2"	name="md5"> </option>
+											<option value="3"	name="gtc"> </option>
+										</select>
+									</td>
+								</tr>
+							</table>
+							<table>
+								<tr>
+									<td >
+										<div class="settingbtn">
+											<input id="srchNw" name="srchNw" style="margin-left:32px; margin-top:10px; width:130px" value="Search Network" type="button" />
+											<input type="button" id="savedNw" name="savedNw" style="margin-top:10px; width:130px" value="Saved Network"/>
+										</div>
+									</td>
+								</tr>	
+							</table>
+							<fieldset id="wifiAccPoints" class="none">
+								<legend>
+									<label name="availableNw" style="font-weight: bold;font-size: 14px;"> </label>
+								</legend>
+								<div id='Group1' class='config-leftpart' style="width: 610px">
+								<table class='List-table' >
+									<tr class='header1'>
+										<style>#number{width:10%} </style>
+										<th id='number' ><label name='number'> </label></th>
+										
+										<style>#select{width:10%} </style>
+										<th id='select' ><label name='select'> </label></th>
+										
+										<style>#nwName{width:50%} </style>
+										<th id='nwName'><label name='nwName'> </label></th>
+										
+										<style>#nwType{width:20%} </style>
+										<th id='nwType' ><label name='nwType'> </label></th>
+										
+										<style>#wifiIcons{width:10%} </style>
+										<th id='wifiIcons' ><label name=''> </label></th>
+																									
+									</tr>
+									<script>
+										for(var index=1;index<=30;index++)
+										{
+											document.write("<tr id='availableNwRow"+index+"'>");
+											document.write("<style>{backgrgound-color:#FFFFFF}</style>");
+											
+											document.write("<td>");
+											document.write("<label id='number"+index+"' >"+index+"</label>");
+											document.write("</td>");
+																
+											document.write("<td style='text-align: center;'>");
+											document.write("<input id='select"+index+"' type='radio' > </input>");
+											document.write("</td>");
+				
+											document.write("<td>");
+											document.write("<label  id='nwName"+index+"'> </label>");
+											document.write("</td>");
+												
+											document.write("<td >");
+											document.write("<label id='nwType"+index+"' > </label>");
+											document.write("</td>");
+											
+											document.write("<td style='text-align: center;'>");
+											document.write("<img id='wifiIcons"+index+"'/>");
+											document.write("</td>");																																							
+											document.write("</tr>");
+										}
+									</script>
+								</table>
+								</div>
+							</fieldset>
+							<fieldset id="savedWifiList" class="none">
+								<legend>
+									<label name="savedNw" style="font-weight: bold;font-size: 14px;"> </label>
+								</legend>
+								<div id='savedWifiListTable' class='config-leftpart' style="width: 610px">
+								<table class='List-table' >
+									<tr class='header1'>
+										<style>#number{width:10%} </style>
+										<th id='savedNwNumber'><label name='number'> </label></th>
+
+										<style>#nwName{width:50%} </style>
+										<th id='savedNwName'><label name='nwName'> </label></th>
+
+										<style>#nwType{width:30%} </style>
+										<th id='savedNwType'><label name='nwType'> </label></th>
+
+										<style>#deleteNw{width:10%} </style>
+										<th id='deleteNw'><label name=''> </label></th>													
+									</tr>
+									<script>
+										for(var index=1;index<=30;index++)
+										{
+											document.write("<tr id='savedWifiListTableRow"+index+"'>");
+											document.write("<style>{backgrgound-color:#FFFFFF}</style>");
+
+											document.write("<td style='text-align: center;'>");
+											document.write("<label id='savedNwNumber"+index+"' >"+index+"</label>");
+											document.write("</td>");
+
+											document.write("<td>");
+											document.write("<label  id='savedNwName"+index+"'> </label>");
+											document.write("</td>");
+
+											document.write("<td >");
+											document.write("<label id='savedNwType"+index+"' > </label>");
+											document.write("</td>");
+
+											document.write("<td style='text-align: center;'>");
+											document.write("<img id='deleteNw"+index+"' src='Images/delete.png' class='btn-image tooltip'/>");
+											document.write("</td>");
+											document.write("</tr>");
+										}
+									</script>
+								</table>
+								</div>
+							</fieldset>
+							<table >
+								<tr>
+									<td class="msg-space" style="width:100%"> </td>
+								</tr>
+								<tr>
+									<td>
+										<div class="settingbtn">
+												<input type="button" id="submitAcsPtSetting" name="submit" style="margin-left:32px" />
+												<input type="button" id="cancelAcsPtSetting" name="cancel" /> 
+												<input type="button" id="defaultAcsPtSetting" name="default" />  
+										</div>
+									</td>
+								</tr>	
+							</table>
+							<fieldset style="margin-left: 5px">
+								<legend >
+									<label name="wpsStng"> </label>
+								</legend>
+							</fieldset>	
+							<table >
+								<tr>
+									<td>
+										<div class="settingbtn" style="margin-top: 15px;">
+												<input type="button" id="wpsPushBtn" name="wpsPushBtn" style="margin-left:32px; width: 140px" />
+												<input type="button" id="wpsPinfrmDeviceBtn" name="wpsPinfrmDeviceBtn" style="width: 150px;" /> 
+										</div>
+									</td>
+								</tr>	
+							</table>
+			
+							<table class="param-table">
+								<tr>
+									<td class="td-param-label-2">
+										<label  name="url"> </label>
+									</td>
+									<td class="td-param-value">
+										<input type="text" id="url" maxlength="255"/>
+									</td>
+								</tr>
+							</table>
+							<table >
+								<tr>
+									<td class="msg-space1" style="width:50%"> </td>
+								</tr>
+								
+								<tr>
+									<td >
+										<div class="settingbtn">
+											<input type="button" id="testConnection" name="testConnection" style="margin-left:32px; width:130px; margin-top:2px" />
+										</div>
+									</td>
+								</tr>	
+							</table>
+						</div>
+					</div>				
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
