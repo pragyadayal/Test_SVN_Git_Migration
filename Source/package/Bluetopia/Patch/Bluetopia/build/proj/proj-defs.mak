@@ -1,0 +1,40 @@
+# PROJECT DEFINITION FILE - Linux (AM335x/AM437x)
+
+DEVICE = wl18xx
+#DEVICE = cc256x
+
+CFLAGS += -D$(DEVICE)
+#CFLAGS += -DSHARED_TRANSPORT
+CFLAGS += -O2
+#CFLAGS += -g
+#CFLAGS += -Wall
+
+LDFLAGS +=
+
+# L2CAP ERTM Support
+ERTM=y
+
+KERNEL_TYPE=threaded
+#KERNEL_TYPE=nonthreaded
+
+AUD=y
+AVCTP=y
+AVRCP=y
+CSCP=y
+GAV=y
+FTP=y
+HDP=y
+HDS=y
+HFP=1_6
+HID=y
+HID_HOST=y
+MAP=y
+OPP=y
+PAN=y
+PBAP=y
+SPPLE=y
+ISPP=n
+TIP=y
+PLATFORM_MANAGER=y
+
+

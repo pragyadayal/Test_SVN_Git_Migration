@@ -1,0 +1,359 @@
+diff -ruN boa-0.94.14rc21/src/boa.h boa-0.94.14rc21Change/src/boa.h
+--- boa-0.94.14rc21/src/boa.h	2005-02-22 19:41:29.000000000 +0530
++++ boa-0.94.14rc21Change/src/boa.h	2013-01-08 10:25:34.000000000 +0530
+@@ -50,6 +50,9 @@
+ #include "defines.h"
+ #include "globals.h"
+ 
++
++#define MATRIX_CHANGES
++
+ /* alias */
+ void add_alias(const char *fakename, const char *realname, enum ALIAS type);
+ int translate_uri(request * req);
+@@ -58,6 +61,11 @@
+ /* config */
+ void read_config_files(void);
+ 
++#ifdef MATRIX_CHANGES
++char *FindSocketFile(char *reqName);
++void DeinitMxChanges();
++#endif
++
+ /* escape */
+ #include "escape.h"
+ 
+@@ -181,6 +189,9 @@
+ void print_debug_usage(void);
+ #endif
+ 
++#ifdef MATRIX_CHANGES
++int Send_Ancillary_Data_on_Unix_Socket(char *socketFile, char *information, int fdTobeSent);
++#endif
+ /* buffer */
+ int req_write(request * req, const char *msg);
+ void reset_output_buffer(request * req);
+diff -ruN boa-0.94.14rc21/src/config.c boa-0.94.14rc21Change/src/config.c
+--- boa-0.94.14rc21/src/config.c	2005-02-22 19:41:29.000000000 +0530
++++ boa-0.94.14rc21Change/src/config.c	2013-01-08 10:25:34.000000000 +0530
+@@ -84,6 +84,7 @@
+ static void c_add_mime_type(char *v1, char *v2, void *t);
+ static void c_add_alias(char *v1, char *v2, void *t);
+ static void c_add_access(char *v1, char *v2, void *t);
++static void c_add_transfer(char *v1, char *v2, void *t);
+ 
+ struct ccommand {
+     const char *name;
+@@ -165,6 +166,9 @@
+     {"CGINice", S2A, c_set_int, &cgi_nice},
+ #endif
+     {"CGIEnv", S2A, c_add_cgi_env, NULL},
++#ifdef MATRIX_CHANGES
++    {"Transfer", S2A, c_add_transfer, NULL},
++#endif
+ };
+ 
+ static void c_add_cgi_env(char *v1, char *v2, void *t)
+@@ -368,6 +372,112 @@
+ #endif                          /* ACCESS_CONTROL */
+ }
+ 
++#ifdef MATRIX_CHANGES
++
++typedef struct
++{
++	char	*reqName;
++	char	*socketFile;
++}
++TRANSFER_CONFIG_t;
++
++static TRANSFER_CONFIG_t	*transCfgPtr = NULL;
++static unsigned int 		transCfgSize = 0;
++
++//*****************************************************************************
++//	c_add_transfer()
++//	Param:
++//		IN : v1		- Arg 1
++//			 v2		- Arg 2
++//			 t		- NULL
++//		OUT: None
++//	Returns:
++//			NULL
++//	Description:
++//  		This function adds entry to "Transfer" variable configuration.
++//*****************************************************************************
++static void c_add_transfer(char *v1, char *v2, void *t)
++{
++	void	*tmpMemPtr;
++
++	if ( (v1 == NULL)
++	  || (v2 == NULL) )
++	{
++		DIE("Assign Proper Value to \"Transfer\" Variable");
++	}
++
++	// Allocate memory for New Transfer Request
++	tmpMemPtr = realloc(transCfgPtr, ((transCfgSize + 1) *sizeof(TRANSFER_CONFIG_t)));
++
++	if (tmpMemPtr == NULL)
++	{
++		DIE("Failed to allocate memory for new transfer config");
++	}
++
++	transCfgPtr = (TRANSFER_CONFIG_t *)tmpMemPtr;
++
++	transCfgPtr[transCfgSize].reqName = strdup(v1);
++	transCfgPtr[transCfgSize].socketFile = strdup(v2);
++
++	if ( (transCfgPtr[transCfgSize].reqName == NULL)
++      || (transCfgPtr[transCfgSize].socketFile == NULL) )
++	{
++		DIE("Failed to allocate memory for transfer config variables");
++	}
++	else
++	{
++	    DEBUG(DEBUG_CONFIG)
++		{
++	        printf("Transfer Added \"%s\", \"%s\" \n",
++	        		transCfgPtr[transCfgSize].reqName,
++	        		transCfgPtr[transCfgSize].socketFile);
++	    }
++	}
++
++	transCfgSize++;
++}
++
++//*****************************************************************************
++//	FindSocketFile()
++//	Param:
++//		IN : char *reqName - Request Name to be matched in Configuration
++//		OUT: None
++//	Returns:
++//			NULL/ Unix Socket File Name
++//	Description:
++//  		This function look-Up "Transfer" variable configuration if request
++//			name found in configuration it will return respective
++//			Unix Socket File Name.
++//*****************************************************************************
++char * FindSocketFile(char *reqName)
++{
++	unsigned int 	loop;
++	char			*retVal;
++
++	retVal = NULL;
++
++	// loop through configuration
++	for (loop = 0; loop < transCfgSize; loop++)
++	{
++		// Check If request match with configuration variable
++		if (strncasecmp(reqName, transCfgPtr[loop].reqName, strlen(transCfgPtr[loop].reqName)) == 0)
++		{
++			// duplicate respective socket file name
++			retVal = strdup(transCfgPtr[loop].socketFile);
++
++			if (retVal == NULL)
++			{
++				fprintf(stderr, "Memory Allocation Failed for Transfer Variable\n");
++			}
++			break;
++		}
++	}
++
++	return retVal;
++}
++
++#endif
++
+ struct ccommand *lookup_keyword(char *c)
+ {
+     struct ccommand *p;
+diff -ruN boa-0.94.14rc21/src/request.c boa-0.94.14rc21Change/src/request.c
+--- boa-0.94.14rc21/src/request.c	2005-02-22 19:41:29.000000000 +0530
++++ boa-0.94.14rc21Change/src/request.c	2013-02-07 18:10:21.000000000 +0530
+@@ -817,6 +817,67 @@
+         return 0;
+     }
+ 
++#ifdef MATRIX_CHANGES
++
++#define MAX_UNIX_REQUEST_BUFFER_SIZE	256
++
++    char	*unixSocketFile;
++	char	requestBuffer[MAX_UNIX_REQUEST_BUFFER_SIZE];
++	int		outLen;
++
++	// Check this URI in Configuration
++	if ((unixSocketFile = FindSocketFile(req->request_uri)) != NULL)
++	{
++		// Check if Query string exists
++		if (req->query_string == NULL)
++		{
++			outLen= snprintf(requestBuffer,
++							MAX_UNIX_REQUEST_BUFFER_SIZE,
++							"%s",
++							req->request_uri);
++		}
++		else
++		{
++			// request = uri + '?' + query string
++			outLen = snprintf(requestBuffer,
++								MAX_UNIX_REQUEST_BUFFER_SIZE,
++								"%s?%s",
++								req->request_uri, req->query_string);
++		}
++
++		// Check for large request
++		if (outLen >= MAX_UNIX_REQUEST_BUFFER_SIZE)
++		{
++			fprintf(stderr, "Too Large Request\n");
++
++			// If Failed Ack Client with server Error
++			send_r_error(req);
++		}
++		// Send this request on respective Unix socket
++		else if (Send_Ancillary_Data_on_Unix_Socket(unixSocketFile,
++													requestBuffer, req->fd) < 0)
++		{
++			fprintf(stderr, "Failed to Transfer request to %s\n", unixSocketFile);
++
++			// If Failed Ack Client with server Error
++			send_r_error(req);
++		}
++		else
++		{
++			req->status = DONE;
++			// set response to SUCCESS
++			req->response_status = R_REQUEST_OK;
++		}
++
++		free(unixSocketFile);
++
++		SQUASH_KA(req);
++		// declare this request as done
++		return 0;
++	}
++
++#endif
++
+     if (vhost_root) {
+         char *c;
+         if (!req->header_host) {
+diff -ruN boa-0.94.14rc21/src/util.c boa-0.94.14rc21Change/src/util.c
+--- boa-0.94.14rc21/src/util.c	2005-02-22 19:41:29.000000000 +0530
++++ boa-0.94.14rc21Change/src/util.c	2013-01-08 10:25:34.000000000 +0530
+@@ -786,4 +786,115 @@
+     fprintf(stderr, "After parse_debug, debug_level is: %d\n",
+             debug_level);
+ }
++
++// ############################################################################
++// Matrix Changes
++// ############################################################################
++
++#ifdef MATRIX_CHANGES
++
++#include <sys/un.h>
++#define MAX_SUN_PATH_LEN	100
++
++//*****************************************************************************
++//	Send_Ancillary_Data_on_Unix_Socket()
++//	Param:
++//		IN : socketFile		- unix socket File on which data should be sent
++//			 information	- Information data along with Control Data
++//			 fdTobeSent		- Control Data (file Descriptor)
++//		OUT: None
++//	Returns:
++//			-1: on error
++//			> 0: on success
++//	Description:
++// This function writes
++// 							Ancillary Data Method
++//  Fd + Informative Data =========================> Unix Socket
++//
++//*****************************************************************************
++int Send_Ancillary_Data_on_Unix_Socket(char *socketFile, char *information, int fdTobeSent)
++{
++	int 				clientFd;
++	struct sockaddr_un 	clientParam;
++	int					retVal;
++
++	retVal = -1;
++
++	// Check for Invalid Inputs
++	if ( (fdTobeSent == -1)
++	  || (strlen(socketFile) > MAX_SUN_PATH_LEN)
++	  || (access(socketFile, W_OK) != 0)
++	  || (information == NULL) )
++	{
++		fprintf(stderr, "Invalid Input\n");
++	}
++	else
++	{
++		// socket created
++		clientFd = socket(AF_UNIX, SOCK_STREAM, 0);
++
++		if (clientFd < 0)
++		{
++			fprintf(stderr, "socket created failed\n");
++		}
++		else
++		{
++			//socket parameters loaded
++			bzero(&clientParam, sizeof(clientParam));
++			clientParam.sun_family = AF_UNIX;
++			strcpy(clientParam.sun_path, socketFile);
++
++			// connecting to server
++			if (connect(clientFd, (struct sockaddr*)&clientParam, sizeof(clientParam)) < 0)
++			{
++				fprintf(stderr, "socket connect failed %s\n", strerror(errno));
++			}
++			else
++			{
++			    struct msghdr msg = {0};
++			    struct cmsghdr *cmsg;
++			    char buf[CMSG_SPACE(sizeof(int))];  /* ancillary data buffer */
++			    int *fdptr;
++			    struct iovec iov[1];
++
++			    memset(&msg, 0, sizeof(msg));
++
++			    iov[0].iov_base = information;
++			    iov[0].iov_len = strlen(information);
++
++			    msg.msg_iov = iov;
++			    msg.msg_iovlen = 1;
++			    msg.msg_control = buf;
++			    msg.msg_controllen = sizeof(buf);
++			    cmsg = CMSG_FIRSTHDR(&msg);
++			    cmsg->cmsg_level = SOL_SOCKET;
++			    cmsg->cmsg_type = SCM_RIGHTS;
++			    cmsg->cmsg_len = CMSG_LEN(sizeof(int));
++
++			    /* Initialise the payload: */
++			    fdptr = (int *)CMSG_DATA(cmsg);
++
++			    *fdptr = fdTobeSent;
++
++			    if (sendmsg(clientFd, &msg, 0) < 0)
++			    {
++			    	fprintf(stderr, "socket Fd write failed %s\n", strerror(errno));
++			    }
++				else
++				{
++					// successfully passed Data + fd to socket
++					retVal = 0;
++				}
++			}
++
++			//closing connection
++			close(clientFd);
++		}
++	}
++
++	return retVal;
++}
++
++#endif
++
+ #endif

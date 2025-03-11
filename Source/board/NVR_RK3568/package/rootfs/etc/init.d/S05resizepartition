@@ -1,0 +1,14 @@
+#!/bin/sh
+
+SIZE=`df -h | awk '{print $2}'`
+ROOTFS=`echo $SIZE | awk -F ' ' '{print $2}'`
+
+echo $ROOTFS | grep "G"
+
+	if [ $? == "0" ]
+        then
+                echo "Rootfs size in GB"
+        else
+                echo "Rootfs Size in MB"
+                resize2fs /dev/mmcblk0p5
+        fi

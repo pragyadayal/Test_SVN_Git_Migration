@@ -1,0 +1,83 @@
+#!/bin/sh 
+# include platform_common script for debug..
+. $2
+
+SERVICE_NAME=`basename $0`
+
+otpw-gen -R 1 -F /ramdisk/random.txt
+
+#Get the cause of recovery mode
+cat /proc/cmdline | grep recoveryMode=1
+if [ "$?" -eq "0" ]
+then
+	argument=1
+	platform_debug "INFO: Recovery due to kernel fail"
+else
+	argument=2
+	platform_debug "INFO: Recovery due to filesystem fail"
+fi
+
+# Check all the recovery related binary or files are present in recovery app partition.
+for i in $REC_APP_FILE_LIST
+do
+	if [ -f $REC_APP_PATH/$i ]
+	then
+		platform_debug "INFO:Recovery App Files present [$i]" 
+	else
+		platform_debug "INFO:Recovery App All Files are not present "
+		unmount_recovery_app_partition=1
+		break
+	fi
+done
+
+#unmount the recovery app partition if all the recovery related binary or files are not present.
+
+if [ $unmount_recovery_app_partition == 1 ]
+then 
+	while read LINE
+	do	
+		FILESYSTEM=`echo "$LINE" | awk '{print $1}'`
+		MOUNTPOINT=`echo "$LINE" | awk '{print $2}'`
+		FSTYPE=`echo "$LINE" | awk '{print $3}'`
+		OPERATION=`echo "$LINE" | awk '{print $4}'`
+		DEVNUM=`echo "$LINE" | awk '{print $5}'`
+		MTDPARTNUM=`echo "$LINE" | awk '{print $6}'`
+		IOSIZE=`echo "$LINE" | awk '{print $7}'`
+		PARTNAME=`echo "$LINE" | awk '{print $8}'`
+		
+		if [ "$FILESYSTEM" = "ubi1:recApp" ]
+		then
+			platform_debug "Info: Going to unmount recovery app partition"
+			platform_debug "Info:FILESYSTEM 	$FILESYSTEM"
+			platform_debug	"	MOUNTPOINT 	$MOUNTPOINT"
+			platform_debug	"	FSTYPE 		$FSTYPE"
+			platform_debug	"	DEVNUM 		$DEVNUM"
+			platform_debug	"	MTDPARTNUM 	$MTDPARTNUM"
+			platform_debug	"	IOSIZE 		$IOSIZE"
+			platform_debug	"	PARTNAME 	$PARTNAME"
+		
+			mount.sh $FILESYSTEM $MOUNTPOINT $FSTYPE\
+				umnt $DEVNUM $MTDPARTNUM $IOSIZE $PARTNAME $2
+			if [ $? -eq 0 ]
+			then
+				platform_debug "Info: mounted $PARTNAME at $MOUNTPOINT successfully"
+			else
+				platform_debug "Err: $PARTNAME at $MOUNTPOINT mount failed"
+			fi
+		fi
+
+done < $MOUNTFS_CONF_PATH
+fi
+
+#Copy recovery application and web application in ramdisk.
+cp -rf $REC_APP_PATH/web/* /ramdisk/
+cp -rf $REC_APP_PATH/recoveryapp /ramdisk/
+
+#Run the recovery application and web application
+chmod +x /ramdisk/recoveryapp
+/ramdisk/recoveryapp $argument &
+chmod +x /ramdisk/webs
+cd /ramdisk
+./webs &
+
+#End of Script

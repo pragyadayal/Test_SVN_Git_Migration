@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+#################################################################################################
+# PURPOSE	: This script will do,
+#		: 1 - Copy drivers if /lib/modules/new_modules/* (if drivers present) to /lib/modules/*
+#		: 2 - Crating UBI Control node.
+#		: 3 - Running udevd
+#		: 4 - Enable USB's
+###################################################################################################
+
+# include platform_common script for debug..
+. $2
+
+SERVICE_NAME=`basename $0`
+
+for i in $LOAD_DRIVER
+do
+	if [ -f /etc/scripts/loadDrivers ]
+	then
+	{
+		DEVICE_FILE_NAME=$i.ko
+		chmod +x /etc/scripts/loadDrivers
+		/etc/scripts/loadDrivers start $i $DEVICE_FILE_NAME $2
+	}
+	else
+	{
+		platform_debug "MAIN_FS:INFO: LoadDrivers file is not present at path /etc/scripts/"
+		exit
+	}
+	fi
+done
+
+echo 100 > /proc/sys/vm/dirty_expire_centisecs
+echo 100 > /proc/sys/vm/dirty_writeback_centisecs
+
+#remove usb mount path 
+rm -f /mnt/usb*
+rm -f /dev/usb*
+
+if [ -x /sbin/udevd ]
+then
+	/sbin/udevd --daemon --children-max=1 &                                
+fi
+#End of Script

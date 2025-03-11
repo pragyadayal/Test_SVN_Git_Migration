@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+#################################################################################################
+# SCRIPT	: S04hostname
+# AUTHOR	: Vamsi
+# DATE		: 19/12/2017
+# REV		: V1R1.1
+# PLATFORM	: PRASAR UCS / SPARK 200
+# PURPOSE	: This script will set "Matrix" Name as hostname. 
+###################################################################################################
+
+# include platform_common script for debug..
+. $2
+
+SERVICE_NAME=`basename $0`
+
+if [ -f /bin/hostname -a "$1" = "start" ]
+then
+	platform_debug "Info: setting the hostname to $HOSTNAME"
+	hostname $HOSTNAME
+fi
+
+#End of Script

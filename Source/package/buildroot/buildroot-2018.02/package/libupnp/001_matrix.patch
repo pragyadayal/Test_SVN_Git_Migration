@@ -1,0 +1,13 @@
+diff -Naur libupnp-1.6.21/ixml/inc/ixml.h libupnp-new-1.6.21/ixml/inc/ixml.h
+--- libupnp-1.6.21/ixml/inc/ixml.h	2020-06-23 09:32:44.590511389 +0530
++++ libupnp-new-1.6.21/ixml/inc/ixml.h	2020-06-23 09:32:38.581511609 +0530
+@@ -47,7 +47,9 @@
+ 
+ /* Define BOOL. */
+ #ifndef __OBJC__ 
++#ifndef MX_BOOL
+ 	typedef int BOOL;
++#endif
+ #else
+ 	/* For Objective C compilers, include objc.h which defines BOOL. */
+ 	#include <objc/objc.h>

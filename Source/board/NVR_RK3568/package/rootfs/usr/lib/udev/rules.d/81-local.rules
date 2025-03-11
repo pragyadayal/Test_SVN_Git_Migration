@@ -1,0 +1,33 @@
+# There are a number of modifiers that are allowed to be used in some
+# of the different fields. They provide the following subsitutions:
+#
+# %n the "kernel number" of the device.
+#    For example, 'sda3' has a "kernel number" of '3'
+# %e the smallest number for that name which does not matches an existing node
+# %k the kernel name for the device
+# %M the kernel major number for the device
+# %m the kernel minor number for the device
+# %b the bus id for the device
+# %c the string returned by the PROGRAM
+# %s{filename} the content of a sysfs attribute
+# %% the '%' char itself
+#
+
+# Media automounting
+SUBSYSTEM=="block", KERNEL=="sd[a-z]", IMPORT{programe}="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} $env{ID_PATH} $env{ID_SERIAL} %k"
+# The first rtc device is symlinked to /dev/rtc
+KERNEL=="rtc0", SYMLINK+="rtc"
+
+SUBSYSTEM=="net", SUBSYSTEMS=="usb" GOTO+="end"
+
+SUBSYSTEM=="usb", ACTION=="add" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} $attr{devpath} $attr{idVendor} $attr{idProduct} $attr{bInterfaceClass} $attr{bInterfaceSubClass} $attr{bInterfaceProtocol} $attr{bInterfaceNumber} '$attr{vendor}' '$attr{model}' '$attr{rev}' '$attr{manufacturer}' '$attr{product}' '$attr{serial}' %k"
+
+KERNEL=="ttyUSB*", SUBSYSTEM=="tty", ACTION=="add" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} $env{DEVPATH} %k"
+KERNEL=="ttyUSB*", SUBSYSTEM=="tty", ACTION=="remove" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} $env{DEVPATH} %k"
+
+KERNEL=="ttyACM*", SUBSYSTEM=="tty", ACTION=="add" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
+KERNEL=="ttyACM*", SUBSYSTEM=="tty", ACTION=="remove" RUN+="/matrix/bin/devDetect.bin $env{SUBSYSTEM} $env{ACTION} %k"
+
+KERNEL=="event*", ATTRS{name}=="cy8c20434", SYMLINK="input/cy8c20434-ir"
+
+LABLE=="end"

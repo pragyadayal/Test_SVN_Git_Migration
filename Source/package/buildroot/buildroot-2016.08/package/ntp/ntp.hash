@@ -1,0 +1,4 @@
+# From http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p8.tar.gz.md5
+md5	00df80a84ec9528fcfb09498075525bc	ntp-4.2.6p5.tar.gz
+# Calculated based on the hash above
+sha256	d6ab8371f9d31e594eb6922823d5ccd03dcc4e9d84b0e23ea25ac1405432f91c	ntp-4.2.6p5.tar.gz

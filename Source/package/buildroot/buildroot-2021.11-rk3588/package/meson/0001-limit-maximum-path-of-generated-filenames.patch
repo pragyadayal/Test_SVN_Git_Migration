@@ -1,0 +1,54 @@
+From 7eb5709bd9105c3ab9eec935b4b2b14d2ca7940b Mon Sep 17 00:00:00 2001
+From: Eli Schwartz <eschwartz@archlinux.org>
+Date: Wed, 7 Sep 2022 15:36:52 -0400
+Subject: [PATCH] backends: limit maximum path of generated filenames
+
+When calculating the output filename for a compiled object, we sanitize
+the whole input path, more or less. In cases where the input path is
+very long, this can overflow the max length of an individual filename
+component.
+
+At the same time, we do want unique names so people can recognize what
+these outputs actually are. Compromise:
+
+- for filepaths with >5 components (which are a lot more likely to cause
+  problems, and simultanously less likely to have crucial information that
+  far back in the filepath)
+- if an sha1 hash of the full path, replacing all *but* those last 5
+  components, produces a path that is *shorter* than the original path
+
+... then use that modified path canonicalization via a hash. Due to the
+use of hashes, it's unique enough to guarantee correct builds. Because
+we keep the last 5 components intact, it's easy to tell what the output
+file is compiled from.
+
+Fixes building in ecosystems such as spack, where the build environment
+is a very long path containing repetitions of
+`__spack_path_placeholder__/` for... reasons of making the path long.
+---
+ mesonbuild/backend/backends.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/mesonbuild/backend/backends.py b/mesonbuild/backend/backends.py
+index 304bea3dde08..64c8fa1b95cb 100644
+--- a/mesonbuild/backend/backends.py
++++ b/mesonbuild/backend/backends.py
+@@ -781,9 +781,17 @@ def determine_rpath_dirs(self, target: T.Union[build.BuildTarget, build.CustomTa
+ 
+     @staticmethod
+     def canonicalize_filename(fname: str) -> str:
++        parts = Path(fname).parts
++        hashed = ''
++        if len(parts) > 5:
++            temp = '/'.join(parts[-5:])
++            # is it shorter to hash the beginning of the path?
++            if len(fname) > len(temp) + 41:
++                hashed = hashlib.sha1(fname.encode('utf-8')).hexdigest() + '_'
++                fname = temp
+         for ch in ('/', '\\', ':'):
+             fname = fname.replace(ch, '_')
+-        return fname
++        return hashed + fname
+ 
+     def object_filename_from_source(self, target: build.BuildTarget, source: 'FileOrString') -> str:
+         assert isinstance(source, mesonlib.File)

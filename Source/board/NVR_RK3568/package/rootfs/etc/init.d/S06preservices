@@ -1,0 +1,64 @@
+#!/bin/sh
+#include config file
+# Include config file
+. /etc/init.d/platform_debug
+
+LOAD_DRIVER="MxGpioDrv watchdog"
+DRIVERS_PATH=/matrix/ko/extdrv
+
+
+function loadDrivers()
+{
+	DEVICE_FILE=$2
+	DEVICE_NAME=$1
+	
+	platform_debug "MAIN_FS:INFO: Starting Matrix $DEVICE_NAME Module"
+
+	if [ -e /dev/${DEVICE_NAME} ]
+	then	
+	{
+		rm -f /dev/${DEVICE_NAME}*
+	}
+	else
+	{
+		platform_debug "MAIN_FS:INFO: $DEVICE_NAME is not present"
+	}
+	fi
+	
+	insmod $DRIVERS_PATH/$DEVICE_FILE
+
+	if [ "$?" -eq 0 ]
+	then
+	{
+		platform_debug "MAIN_FS:INFO: $DEVICE_FILE is inserted sucessfully"
+	}
+	else
+	{
+		platform_debug "MAIN_FS:INFO: $DEVICE_FILE insertion failed."
+		exit 
+	}
+	fi
+	
+	for i in `grep $DEVICE_NAME /proc/devices` ; do
+	if [ $i != $DEVICE_NAME ]; then
+	{
+		major=$i
+		break;
+	}
+	fi
+	done
+	
+	if [ $major -ne 0 ]; then                                                  
+	{                                                                          
+		  mknod /dev/${DEVICE_NAME} c $major 0                        
+	}  
+	fi
+}
+
+
+for i in $LOAD_DRIVER
+do
+	DEVICE_FILE_NAME=$i.ko
+	loadDrivers $i $DEVICE_FILE_NAME $2
+
+done

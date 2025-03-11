@@ -1,0 +1,25 @@
+########################################################################
+# The following section must be updated per local configuration
+########################################################################
+# Path to local toolchain installation
+export TOOLCHAIN_PATH=/opt/gcc-linaro-5.3-2016.02-x86_64_arm-linux-gnueabihf/bin/
+
+# Path to SDK compiled kernel
+export KERNEL_PATH=../../../../kernel/linux-4.4.12/
+
+########################################################################
+# The following defintions should not be updated
+########################################################################
+# Path to root directory of Bluetopia Core
+export BLUETOPIA_CORE_PATH=../BluetopiaPM/Bluetopia
+
+# Path to root directory of BluetopiaPM Core
+export BLUETOPIA_PM_CORE_PATH=../BluetopiaPM/
+
+# PROJ_DIR Must (!!!) kept empty 
+export PROJ_DIR=
+
+# output (distribution root)
+export OUT_DIR=..
+
+

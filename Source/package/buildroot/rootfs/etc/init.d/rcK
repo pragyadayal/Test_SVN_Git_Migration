@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo "mainfs:info: running rcK on system shutdown"
+#Run services based on "K*" symbol 
+
+for i in /etc/rc.d/$1*; do
+	[ -x $i ] && $i $2 
+done
+
+#End of rcK

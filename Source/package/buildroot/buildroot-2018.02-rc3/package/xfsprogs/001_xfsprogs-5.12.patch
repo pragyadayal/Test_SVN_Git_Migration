@@ -1,0 +1,26 @@
+Index: xfsprogs-5.12.0/mdrestore/Makefile
+===================================================================
+--- xfsprogs-5.12.0.orig/mdrestore/Makefile
++++ xfsprogs-5.12.0/mdrestore/Makefile
+@@ -10,7 +10,7 @@ CFILES = xfs_mdrestore.c
+ 
+ LLDLIBS = $(LIBXFS) $(LIBFROG) $(LIBRT) $(LIBPTHREAD) $(LIBUUID)
+ LTDEPENDENCIES = $(LIBXFS) $(LIBFROG)
+-LLDFLAGS = -static
++LLDFLAGS = -static-libtool-libs
+ 
+ default: depend $(LTCOMMAND)
+ 
+Index: xfsprogs-5.12.0/scrub/Makefile
+===================================================================
+--- xfsprogs-5.12.0.orig/scrub/Makefile
++++ xfsprogs-5.12.0/scrub/Makefile
+@@ -73,7 +73,7 @@ xfs_scrub.c
+ 
+ LLDLIBS += $(LIBHANDLE) $(LIBFROG) $(LIBPTHREAD) $(LIBICU_LIBS) $(LIBRT)
+ LTDEPENDENCIES += $(LIBHANDLE) $(LIBFROG)
+-LLDFLAGS = -static
++LLDFLAGS = -static-libtool-libs
+ 
+ ifeq ($(HAVE_MALLINFO),yes)
+ LCFLAGS += -DHAVE_MALLINFO

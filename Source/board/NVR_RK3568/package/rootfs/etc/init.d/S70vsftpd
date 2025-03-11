@@ -1,0 +1,36 @@
+#! /bin/sh
+
+# Include config file
+. /etc/init.d/platform_debug
+
+set -e
+
+DESC="vsftpd"
+NAME=vsftpd
+DAEMON=/usr/sbin/$NAME
+
+case "$1" in
+  start)
+	platform_debug "Starting $DESC: "
+	start-stop-daemon -S -b -x $NAME
+	echo "OK"
+	;;
+  stop)
+	platform_debug "Stopping $DESC: "
+	start-stop-daemon -K -x $NAME
+	echo "OK"
+	;;
+  restart|force-reload)
+	platform_debug "Restarting $DESC: "
+	$0 stop
+	sleep 1
+	$0 start
+	echo ""
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

@@ -1,0 +1,11 @@
+
+
+Product name: RV1126 Images for USB upgrade:
+
+--> Requirement: RLE adn uncompress BMP images are required.
+--> Image name should be short.
+--> Command to convert jpg to bmp
+
+    command: convert -compress rle K_U_S.jpg K_U_S.bmp
+    
+ex: BootLoaderUpgradedFailed.bmp --> B_U_F.bmp

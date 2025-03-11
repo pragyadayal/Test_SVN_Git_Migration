@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+#################################################################################################
+# SCRIPT	: S99done
+# AUTHOR	: Sourabh Jain
+# DATE		: 13/07/2018
+# PLATFORM	: MIB
+# PURPOSE	: This script contains only note, we can do any operation also if required.
+###################################################################################################
+
+# Give root permissions
+chmod 755 ..
+chown root:root ..
+
+echo "***************************************************************"
+echo "************* All Services are Completed ***************"
+echo "***************************************************************"
+
+#End of Script

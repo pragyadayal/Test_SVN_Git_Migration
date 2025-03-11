@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Start logging
+#
+# Include config file
+. /etc/init.d/platform_debug
+
+# Create log file in matrix log folder of 200KB with 1 file rotation
+SYSLOGD_ARGS="-O /matrix/log/log.boot -s 200 -b 1"
+KLOGD_ARGS=-n
+[ -r /etc/default/logging ] && . /etc/default/logging
+
+start() {
+	platform_debug "Starting logging: "
+	start-stop-daemon -b -S -q -m -p /var/run/syslogd.pid --exec /sbin/syslogd -- $SYSLOGD_ARGS
+	start-stop-daemon -b -S -q -m -p /var/run/klogd.pid --exec /sbin/klogd -- $KLOGD_ARGS
+	echo "OK"
+}
+
+stop() {
+	platform_debug "Stopping logging: "
+	start-stop-daemon -K -q -p /var/run/syslogd.pid
+	start-stop-daemon -K -q -p /var/run/klogd.pid
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

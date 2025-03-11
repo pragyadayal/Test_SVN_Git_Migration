@@ -1,0 +1,62 @@
+#!/bin/sh
+
+
+# Include config file
+. /etc/init.d/platform_debug
+
+if [ -f $MAINFS_START_LOG_DIR/$MAINFS_START_LOG_FILE ]
+then
+	mv $MAINFS_START_LOG_DIR/$MAINFS_START_LOG_FILE $MAINFS_START_LOG_DIR/prev_$MAINFS_START_LOG_FILE
+fi
+
+# Export Variables 
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/matrix/bin:/matrix/script:/etc/scripts:$MATRIX_EXPORT_PATH
+export LD_LIBRARY_PATH=$MATRIX_LD_LIB_PATH
+
+platform_debug "Info: Running rcS on system init"
+
+
+# Start all init scripts in /etc/init.d
+# executing them in numerical order.
+#
+for i in /etc/init.d/S??* ;do
+     
+     platform_debug $i
+     
+     #Do not start ftp
+     if [ "$i" = /etc/init.d/S70vsftpd ];then
+      	continue 	
+     fi	
+      
+     if [ "$i" = /etc/init.d/S80dnsmasq ];then
+        continue 	
+     fi	
+     
+     #Do not start smb
+     if [ "$i" == /etc/init.d/S91smb ];then
+     	continue
+     fi
+     
+     #Do not start nfs
+     if [ "$i" == /etc/init.d/S60nfs ];then
+     	continue
+     fi
+     
+     # Ignore dangling symlinks (if any).
+     [ ! -f "$i" ] && continue
+
+     case "$i" in
+	*.sh)
+	    # Source shell script for speed.
+	    (
+		trap - INT QUIT TSTP
+		set start
+		. $i
+	    )
+	    ;;
+	*)
+	    # No sh extension, so fork subprocess.
+	    $i start
+	    ;;
+    esac
+done

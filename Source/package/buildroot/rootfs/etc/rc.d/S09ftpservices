@@ -1,0 +1,25 @@
+#!/bin/sh 
+. $2
+
+SERVICE_NAME=`basename $0`
+
+if [ "$1" = "start" ]
+then
+	if [ -f /usr/sbin/vsftpd ]
+	then
+		platform_debug "INFO: Running vsftpd deamon start"
+		mkdir -m 0755 -p /var/run/vsftpd
+		chmod 755 /usr/sbin/vsftpd
+		/usr/sbin/vsftpd &
+	fi
+fi
+
+if [ "$1" = "stop" ]
+then
+	if [ -f /usr/sbin/vsftpd ]
+	then
+		platform_debug "INFO:Vsftpd deamon stop"
+		killall vsftpd
+		rm -rf /var/run/vsftpd
+	fi
+fi 

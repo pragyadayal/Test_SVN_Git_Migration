@@ -1,0 +1,19 @@
+Index: ntp-4.2.8p13/sntp/networking.c
+===================================================================
+--- ntp-4.2.8p13.orig/sntp/networking.c
++++ ntp-4.2.8p13/sntp/networking.c
+@@ -263,12 +263,12 @@ process_pkt (
+ 		}
+ 	}
+ 	/* If the server is not synced it's not really useable for us */
+-	if (LEAP_NOTINSYNC == PKT_LEAP(rpkt->li_vn_mode)) {
++/*	if (LEAP_NOTINSYNC == PKT_LEAP(rpkt->li_vn_mode)) {
+ 		msyslog(LOG_ERR,
+ 			"%s: %s not in sync, skipping this server",
+ 			func_name, stoa(sender));
+ 		return SERVER_UNUSEABLE;
+-	}
++	}*/
+ 
+ 	/*
+ 	 * Decode the org timestamp and make sure we're getting a response

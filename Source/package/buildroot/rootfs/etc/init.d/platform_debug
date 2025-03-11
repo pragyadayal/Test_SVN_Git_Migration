@@ -1,0 +1,8 @@
+
+platform_debug()
+{
+	if test ! -z "$1"
+	then
+		echo -e "[`date +%c`] mainfs: $SERVICE_NAME: $1" >> $MAINFS_START_LOG_DIR/$MAINFS_START_LOG_FILE
+	fi
+}

@@ -1,0 +1,114 @@
+#!/bin/sh
+#
+##################################################################################################
+# PURPOSE	: This script will read the data from mountpart.conf and mount the partition on by one
+#		: 
+#filesystem   	mountpoint  	type    DevNum  mtdPartNum    ubiIOsize ubiPartName
+#ubi2:data	/mnt/usbtest	ubifs	2	   10		2048		data
+#initrd 		/ramdisk	ramfs	1	0	0	0	0	
+#randisk		/ramdisk	ramfs	0	0	0	0	0 
+#
+###################################################################################################
+#include the rc.conf file
+. $2
+
+SERVICE_NAME=`basename $0`
+echo "***************************************************************"
+echo "********** $HOSTNAME Services are started from rcS ***********"
+echo "***************************************************************"
+
+# This will mount all the filesystem mentioned in fstab 
+mount -a -n 
+
+
+if [ "$MOUNTFS_CONF_PATH"  == "" ]
+then
+	exit
+fi
+
+
+rm -f /dev/ubi_ctrl
+MINOR=`cat $UBI_CTRL_DEV_PATH | awk -F : '{print $2}'`
+mknod /dev/ubi_ctrl c $UBI_CTRL_MAJ_NUM $MINOR
+
+if [ ! -e /etc/mtab ]
+then
+	ln -s /proc/mounts /etc/mtab
+fi
+
+while read LINE
+do	
+	#Read the each line from the config file and get the info to mount the file system
+	FILESYSTEM=`echo "$LINE" | awk '{print $1}'`
+	echo $FILESYSTEM | grep '#'
+	if [ "$?" == "0" ]
+	then
+		continue
+	fi
+	MOUNTPOINT=`echo "$LINE" | awk '{print $2}'`
+	FSTYPE=`echo "$LINE" | awk '{print $3}'`
+	OPERATION=`echo "$LINE" | awk '{print $4}'`
+	DEVNUM=`echo "$LINE" | awk '{print $5}'`
+	MTDPARTNUM=`echo "$LINE" | awk '{print $6}'`
+	IOSIZE=`echo "$LINE" | awk '{print $7}'`
+	PARTNAME=`echo "$LINE" | awk '{print $8}'`
+	
+	platform_debug "Info:FILESYSTEM-$FILESYSTEM \
+			MOUNTPOINT-$MOUNTPOINT \
+			FSTYPE-$FSTYPE \
+			OPERATION-$OPERATION \
+			DEVNUM-$DEVNUM \
+			MTDPARTNUM-$MTDPARTNUM \
+			IOSIZE-$IOSIZE \
+			PARTNAME-$PARTNAME"
+	
+		if [ "$FSTYPE" = "ubifs" ]
+		then
+			if [ ! -d $MOUNTPOINT ]
+			then
+				mkdir $MOUNTPOINT
+				chmod 755 $MOUNTPOINT
+			fi
+		#Mount The UBIFS file system if mounting is failed the formate the partition and it will be mounted
+			mount.sh $FILESYSTEM $MOUNTPOINT $FSTYPE\
+				$OPERATION $DEVNUM $MTDPARTNUM $IOSIZE $PARTNAME $2
+			if [ $? -eq 0 ]
+			then
+				platform_debug "Info: mounted $PARTNAME at $MOUNTPOINT successfully"
+			else
+				platform_debug "Err: $PARTNAME at $MOUNTPOINT mount failed"
+				mount.sh $FILESYSTEM $MOUNTPOINT $FSTYPE\
+					fmnt $DEVNUM $MTDPARTNUM $IOSIZE $PARTNAME $2
+				platform_debug "Info: $PARTNAME partition formatted"
+			fi
+
+		#Mount the RAM based file system
+		elif [ "$FSTYPE" = "ramfs" ]
+		then
+			mount.sh $FILESYSTEM $MOUNTPOINT $FSTYPE\
+				$OPERATION $DEVNUM $MTDPARTNUM $IOSIZE $PARTNAME $2
+			if [ $? -eq 0 ]
+			then
+				platform_debug "Info: mounted $PARTNAME at $MOUNTPOINT successfully"
+			else
+				platform_debug "Err: Failed to mount $PARTNAME at $MOUNTPOINT "
+			fi
+		#Mount the Temp file system
+		elif [ "$FSTYPE" = "rwfs" ]
+		then
+			mount.sh $FILESYSTEM $MOUNTPOINT $FSTYPE\
+					$OPERATION $DEVNUM $MTDPARTNUM $IOSIZE $PARTNAME $2
+			if [ $? -eq 0 ]
+			then
+				platform_debug "Info: mounted $PARTNAME at $MOUNTPOINT successfully"
+			else
+				platform_debug "Err: Failed to mount $PARTNAME at $MOUNTPOINT "
+			fi
+		else
+			platform_debug "Err: INVALID File System Type:$FSTYPE "
+		fi
+
+
+done < $MOUNTFS_CONF_PATH
+platform_debug "Info:Filesystem related service done"
+#End of Script
